@@ -6,7 +6,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-TEXTURE *woodTexture;
+// wood and planks
+TEXTURE *whitePlanksTexture;
+TEXTURE *whiteWoodTexture;
+TEXTURE *darkPlanksTexture;
+TEXTURE *darkWoodTexture;
+// materials
+TEXTURE *brickTexture;
 TEXTURE *wallTexture;
 TEXTURE *rubberTexture;
 TEXTURE *beltTexture;

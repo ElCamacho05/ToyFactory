@@ -11,7 +11,11 @@ typedef struct texture {
     unsigned char *data;
 } TEXTURE;
 
-extern TEXTURE *woodTexture;
+extern TEXTURE *whitePlanksTexture;
+extern TEXTURE *whiteWoodTexture;
+extern TEXTURE *darkPlanksTexture;
+extern TEXTURE *darkWoodTexture;
+extern TEXTURE *brickTexture;
 extern TEXTURE *wallTexture;
 extern TEXTURE *rubberTexture;
 extern TEXTURE *beltTexture;

@@ -22,7 +22,7 @@
 float camPosition[]= {1.0f, 1.0f, 1.0f};
 float camPointTo[]= {0.0f, 0.0f, 0.0f};
 
-float viewWidth = 2.5f;
+float viewWidth = 5.0f;
 float aspectRatio = 1.0f;
 
 float speed = 0.5f;     
@@ -37,7 +37,6 @@ long startTime = 0.0;
 float sceneTime = 0.0f;
 long beforeSceneTime = 0.0;
 
-void drawSceneObjects();
 void display();
 void animation();
 void initGL();
@@ -81,28 +80,104 @@ void setupSceneLighting() {
 }
 
 void setupTextures() {
+    // wood
+    darkWoodTexture = loadTexture("DrawUtils/Textures/Files/dark-wood.png");
+    // darkWoodTexture = loadTexture("DrawUtils/Textures/Files/dark.png");
+    darkPlanksTexture = loadTexture("DrawUtils/Textures/Files/dark-planks.jpg");
+    whiteWoodTexture = loadTexture("DrawUtils/Textures/Files/white-wood.jpg");
+    whitePlanksTexture = loadTexture("DrawUtils/Textures/Files/white-planks.png");
+
+    // materials
     wallTexture = loadTexture("DrawUtils/Textures/Files/wall.jpg");
-    woodTexture = loadTexture("DrawUtils/Textures/Files/wood.png");
     rubberTexture = loadTexture("DrawUtils/Textures/Files/rubber.jpg");
     beltTexture = loadTexture("DrawUtils/Textures/Files/belt.png");
+    brickTexture = loadTexture("DrawUtils/Textures/Files/brick.jpg");
     // whitePlasticPattern = loadTexture("DrawUtils/Textures/Files/white-plastic-pattern.png");
     blockyGold = loadTexture("DrawUtils/Textures/Files/blocky-gold.png");
 }
 
 void drawTestSceneObjects() {
-    int x_range = 1;
-    int z_range = 1;
+    int x_range = 3;
+    int z_range = 3;
 
     // draw example tile map
     for (int x=-x_range; x <= x_range; x++) {
         for (int z=-z_range; z <= z_range; z++) {
             glPushMatrix();
                 glTranslatef(x, 0.0, z);
-                scDrawMapTile(&matWhiteWall, woodTexture);
+                scDrawMapTile(&matWhiteWall, whitePlanksTexture);
 
             glPopMatrix();
         }
+        glPushMatrix();
+            glRotatef(90.0, 0.0, 1.0, 0.0);
+            glTranslatef(x, 0.0, -4.0);
+            glPushMatrix();
+            scDrawWall();
+        glPopMatrix();
     }
+
+    glPushMatrix();
+        glTranslatef(-2.0, 1.0, 2.0);
+        scDrawLamp();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-2.0, 0.0, 1.0);
+        scDrawChair();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-2.0, 0.0, 2.0);
+        scDrawTable();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-3.0, 0.0, -4.0);
+        scDrawWall();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-2.0, 0.0, -4.0);
+        scDrawWall();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-1.0, 0.0, -4.0);
+        scDrawWindow();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(0.0, 0.0, -4.0);
+        scDrawWindow();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(1.0, 0.0, -4.0);
+        scDrawWall();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(2.0, 0.0, -4.0);
+        scDrawDoor();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(3.0, 0.0, -4.0);
+        scDrawWall();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-3.0, 0.0, -3.0);
+        scDrawChristmasTree();
+    glPopMatrix();
+
+    glPushMatrix();
+        // glTranslatef(-1.0, 0.0, -1.0);
+        glRotatef(90.0, 0.0, 1.0, 0.0);
+        scDrawFunnel();
+    glPopMatrix();
+    scDrawStartM();
     scDrawConveyorBelt();
 }
 
@@ -164,9 +239,18 @@ void keyboard(unsigned char key, int x, int y) {
         exit(0);
     }
 
+    else if (key == 'z' || key == 'Z') {
+        viewWidth -= 0.1;
+    }
+
+    else if (key == 'x' || key == 'X') {
+        viewWidth += 0.1;
+    }
+
     else {
         return;
     }
+    glutPostRedisplay();
 }
 
 void reshape(int w, int h) {
@@ -177,16 +261,16 @@ void reshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
-    aspectRatio = (float)w / (float)h;
+    float aR = (float)w / (float)h;
     
     // glOrtho(left, right, bottom, top, near, far)
     if (w >= h) {
-        glOrtho(-viewWidth * aspectRatio, viewWidth * aspectRatio, 
+        glOrtho(-viewWidth * aR, viewWidth * aR, 
                 -viewWidth, viewWidth, 
                 -100.0, 1000.0);
     } else {
         glOrtho(-viewWidth, viewWidth, 
-                -viewWidth / aspectRatio, viewWidth / aspectRatio, 
+                -viewWidth / aR, viewWidth / aR, 
                 -100.0, 1000.0);
     }
     

@@ -208,11 +208,10 @@ void utDrawRectangle(double width, double height, MATERIAL *mat) {
     glEnd();
 }
 
-// En utils.c
 void utDrawTexturedCube(float size) {
-    float s = size / 2.0f; // La mitad del tamaño (radio)
+    float s = size / 2.0f;
 
-    // Cara Frontal
+    // Front
     glNormal3f(0.0f, 0.0f, 1.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-s, -s,  s);
@@ -221,7 +220,7 @@ void utDrawTexturedCube(float size) {
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-s,  s,  s);
     glEnd();
 
-    // Cara Trasera
+    // Back
     glNormal3f(0.0f, 0.0f, -1.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(-s, -s, -s);
@@ -230,7 +229,7 @@ void utDrawTexturedCube(float size) {
         glTexCoord2f(0.0f, 0.0f); glVertex3f( s, -s, -s);
     glEnd();
 
-    // Cara Superior (Top)
+    // top
     glNormal3f(0.0f, 1.0f, 0.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-s,  s, -s);
@@ -239,7 +238,7 @@ void utDrawTexturedCube(float size) {
         glTexCoord2f(1.0f, 1.0f); glVertex3f( s,  s, -s);
     glEnd();
 
-    // Cara Inferior (Bottom)
+    // bottom
     glNormal3f(0.0f, -1.0f, 0.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(-s, -s, -s);
@@ -248,7 +247,7 @@ void utDrawTexturedCube(float size) {
         glTexCoord2f(1.0f, 0.0f); glVertex3f(-s, -s,  s);
     glEnd();
 
-    // Cara Derecha
+    // right
     glNormal3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 0.0f); glVertex3f( s, -s, -s);
@@ -257,7 +256,7 @@ void utDrawTexturedCube(float size) {
         glTexCoord2f(0.0f, 0.0f); glVertex3f( s, -s,  s);
     glEnd();
 
-    // Cara Izquierda
+    // left
     glNormal3f(-1.0f, 0.0f, 0.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-s, -s, -s);
