@@ -13,6 +13,11 @@ typedef struct texture {
 
 extern TEXTURE *woodTexture;
 extern TEXTURE *wallTexture;
+extern TEXTURE *rubberTexture;
+extern TEXTURE *beltTexture;
+extern TEXTURE *whitePlasticPattern;
+extern TEXTURE *blockyGold;
+
 
 TEXTURE *loadTexture(const char *filename);
 int genTexture(TEXTURE *texture);

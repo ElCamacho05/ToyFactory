@@ -42,6 +42,8 @@ void display();
 void animation();
 void initGL();
 void setupSceneLighting();
+void drawTestSceneObjects();
+void drawTileElements();
 void setupTextures();
 void keyboard(unsigned char key, int x, int y);
 void reshape(int w, int h);
@@ -53,9 +55,9 @@ int main(int argc, char **argv) {
     glutCreateWindow("Christmas Factory");
 
     initGL();
-    scInitLists();         
-    setupSceneLighting();
     setupTextures();
+    setupSceneLighting();
+    scInitLists();         
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
 
@@ -79,30 +81,34 @@ void setupSceneLighting() {
 }
 
 void setupTextures() {
-    wallTexture = loadTexture("DrawUtils/Textures/wall.jpg");
-    // genTexture(wallTexture);
-    // boundTexture(wallTexture);
-
-    woodTexture = loadTexture("DrawUtils/Textures/wood.png");
-    // genTexture(woodTexture);
-    // boundTexture(woodTexture);
+    wallTexture = loadTexture("DrawUtils/Textures/Files/wall.jpg");
+    woodTexture = loadTexture("DrawUtils/Textures/Files/wood.png");
+    rubberTexture = loadTexture("DrawUtils/Textures/Files/rubber.jpg");
+    beltTexture = loadTexture("DrawUtils/Textures/Files/belt.png");
+    // whitePlasticPattern = loadTexture("DrawUtils/Textures/Files/white-plastic-pattern.png");
+    blockyGold = loadTexture("DrawUtils/Textures/Files/blocky-gold.png");
 }
 
-void drawSceneObjects() {
+void drawTestSceneObjects() {
     int x_range = 1;
     int z_range = 1;
 
-    
+    // draw example tile map
     for (int x=-x_range; x <= x_range; x++) {
         for (int z=-z_range; z <= z_range; z++) {
             glPushMatrix();
                 glTranslatef(x, 0.0, z);
                 scDrawMapTile(&matWhiteWall, woodTexture);
+
             glPopMatrix();
         }
     }
+    scDrawConveyorBelt();
 }
 
+void drawTileElements() {
+
+}
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -116,7 +122,7 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
 
-    drawSceneObjects();
+    drawTestSceneObjects();
 
     glutSwapBuffers();
 }

@@ -8,6 +8,11 @@
 
 TEXTURE *woodTexture;
 TEXTURE *wallTexture;
+TEXTURE *rubberTexture;
+TEXTURE *beltTexture;
+TEXTURE *whitePlasticPattern;
+TEXTURE *blockyGold;
+
 
 TEXTURE *loadTexture(const char *filename) {
     TEXTURE *newTexture = (TEXTURE *) malloc(sizeof(TEXTURE));

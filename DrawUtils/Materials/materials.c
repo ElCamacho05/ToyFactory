@@ -132,7 +132,7 @@ MATERIAL matMetalDull = {
 };
 
 // ============================================================================
-// INDUSTRIAL & MILITARY MATERIALS
+// INDUSTRIAL MATERIALS
 // ============================================================================
 
 MATERIAL matDarkMetal = {
@@ -168,6 +168,20 @@ MATERIAL matCamoBrown = {
     .diffuse   = {0.35f, 0.25f, 0.15f, 1.0f}, // Marrón tierra
     .specular  = {0.1f, 0.1f, 0.1f, 1.0f},
     .shininess = 5.0f
+};
+
+MATERIAL matPlasticChristmasGreen = {
+    // Ambient: Un verde muy oscuro y profundo, casi negro
+    .ambient   = {0.0f, 0.15f, 0.05f, 1.0f},
+    
+    // Diffuse: El color principal, un verde pino intenso (no fosforescente)
+    .diffuse   = {0.05f, 0.45f, 0.15f, 1.0f},
+    
+    // Specular: Brillo grisáceo/blanco (típico del plástico pulido)
+    .specular  = {0.4f, 0.5f, 0.4f, 1.0f},
+    
+    // Shininess: Brillo concentrado pero visible
+    .shininess = 32.0f
 };
 
 // ============================================================================

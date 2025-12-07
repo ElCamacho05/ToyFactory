@@ -13,23 +13,17 @@ int time = 0;
 
 void scInitLists() {
     scInitMapTile();
+    scInitConveyorBelt();
 }
 
-
+// MAP TILES
 void scInitMapTile() {
     scMapTile = glGenLists(1);
-    glNewList(scMapTile, GL_COMPILE);
-        // Material de suelo industrial limpio
-        
+    glNewList(scMapTile, GL_COMPILE);        
         glPushMatrix();
-            // Centramos el tile (asumiendo tiles de 2x2 unidades)
-            // Grosor de 0.2 para que se vea sólido
             glTranslatef(0.0f, -0.1f, 0.0f); 
             glScalef(1.0f, 0.2f, 1.0f); 
             utDrawTexturedCube(1.0);
-            
-            // Borde opcional para diferenciar tiles (simulado con un wireframe o color diferente)
-            // O simplemente confiamos en la iluminación del cubo
         glPopMatrix();
     glEndList();
 }
@@ -49,78 +43,105 @@ void scDrawMapTile(MATERIAL *mat, TEXTURE *texture) {
     }
 }
 
+// CONVEYOR BELT
 void scInitConveyorBelt() {
     scConveyorBelt = glGenLists(1);
     glNewList(scConveyorBelt, GL_COMPILE);
-        
-        // --- La Base de la cinta (Metal oscuro) ---
-        // applyMaterial(&matDarkMetal);
-        glPushMatrix();
-            glScalef(2.0f, 0.5f, 1.8f); // Un poco más estrecha que el tile completo
-            glutSolidCube(1.0);
-        glPopMatrix();
 
-        // --- La Banda de Goma (Negra mate) ---
-        applyMaterial(&matRubber); 
-        glPushMatrix();
-            glTranslatef(0.0f, 0.26f, 0.0f); // Apenas encima de la base
-            glScalef(2.0f, 0.05f, 1.6f);
-            glutSolidCube(1.0);
-        glPopMatrix();
-
-        // --- Rodillos (Detalle visual en los extremos) ---
-        applyMaterial(&matMetalSilver);
-        for(float x = -0.9f; x <= 0.9f; x += 0.6f) {
+        // Chasis
+        applyMaterial(&matWhiteWall);
+        glEnable(GL_TEXTURE_2D);
+        boundTexture(blockyGold);
             glPushMatrix();
-                glTranslatef(x, 0.25f, -0.8f); // Lado 'front'
-                utDrawCylinder(0.1f, 1.6f, 10, &matMetalSilver); // Rodillo transversal
+                glTranslatef(0.0f, 0.15f, -0.40f);
+                glScalef(1.0f, 0.3f, 0.1f);
+                utDrawTexturedCube(1.0f);
             glPopMatrix();
-        }
+
+            glPushMatrix();
+                glTranslatef(0.0f, 0.15f, 0.40f); 
+                glScalef(1.0f, 0.3f, 0.1f);       
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
+
+        // Rollers
+        applyMaterial(&matMetalSilver);
+        
+        glPushMatrix();
+            glTranslatef(-0.4f, 0.15f, -0.4f); 
+            utDrawCylinder(0.12f, 0.8f, 8, &matMetalSilver);
+        glPopMatrix();
+
+
+        // Rodillo Delantero (X positivo)
+        glPushMatrix();
+            glTranslatef(0.4f, 0.15f, -0.4f); 
+            utDrawCylinder(0.12f, 0.8f, 8, &matMetalSilver);
+        glPopMatrix();
+
+
+        // Belt
+        applyMaterial(&matWhiteWall);
+        glEnable(GL_TEXTURE_2D);
+        boundTexture(beltTexture);
+            // Top-side
+            glPushMatrix();
+                glTranslatef(0.0f, 0.27f, 0.0f);
+                glScalef(0.9f, 0.02f, 0.78f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+            // Bottom-side
+            glPushMatrix();
+                glTranslatef(0.0f, 0.03f, 0.0f);
+                glScalef(0.9f, 0.02f, 0.78f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
+
     glEndList();
 }
 
 void scDrawConveyorBelt() {
-
+    glCallList(scConveyorBelt);
 }
 
 void scInitLamp() {
     scLamp = glGenLists(1);
     glNewList(scLamp, GL_COMPILE);
-        
-        // --- Base ---
-        applyMaterial(&matPlasticRed); // O matMetalGold para algo clásico
+        // Base
+        applyMaterial(&matPlasticRed);
         glPushMatrix();
             glScalef(1.0f, 0.2f, 1.0f);
-            glutSolidSphere(0.5, 20, 20); // Base achatada
+            glutSolidSphere(0.5, 20, 20);
         glPopMatrix();
 
-        // --- Brazo (Inclinado) ---
+        // Arm
         applyMaterial(&matMetal);
         glPushMatrix();
-            // Primer segmento
+            // 1
             glTranslatef(0.0f, 0.1f, 0.0f);
             glRotatef(-30.0f, 1.0f, 0.0f, 0.0f); // Inclinación hacia atrás
             utDrawCylinder(0.05f, 1.5f, 10, &matMetal);
             
-            // Codo
+            // .
             glTranslatef(0.0f, 0.0f, 1.5f);
             glutSolidSphere(0.1, 10, 10);
             
-            // Segundo segmento (hacia adelante)
+            // 2
             glRotatef(75.0f, 1.0f, 0.0f, 0.0f); 
             utDrawCylinder(0.05f, 1.2f, 10, &matMetal);
             
-            // --- Pantalla (Cono cortado) ---
-            glTranslatef(0.0f, 0.0f, 1.2f); // Punta del brazo
+            // Screen
+            glTranslatef(0.0f, 0.0f, 1.2f);
             
-            // Articulación pantalla
+            // art
             glutSolidSphere(0.1, 10, 10);
             
-            glRotatef(45.0f, 1.0f, 0.0f, 0.0f); // Apuntando abajo
+            glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
             
             // Pantalla Roja
             applyMaterial(&matPlasticRed);
-            // GLU Cylinder para cono truncado: base=0.2, top=0.6, height=0.8
             GLUquadricObj *q = gluNewQuadric();
             gluCylinder(q, 0.1f, 0.6f, 0.8f, 20, 20); 
             gluDeleteQuadric(q);
