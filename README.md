@@ -18,3 +18,13 @@ la simulacion seria 3d, pero en un isometric tilemap.
 el primer ambiente es una fabrica como de juguetes de santa, y cuando acaba el usuario de hacer su robot, el usuario puede controlarlo en un mapa generado proceduralmente
 ## Requirements
 wget https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
+
+# Nota Bene:
+
+Ahora estoy intrigada.
+
+Saludos.
+
+Atte.
+
+Profa.Yuliana Berumen
