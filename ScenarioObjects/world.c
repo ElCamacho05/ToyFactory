@@ -8,6 +8,7 @@ ELEMENT *phantom = NULL;
 
 MAP *test = NULL;
 MAP *factory = NULL;
+ROOM *firstRoom = NULL;
 
 // ROOM *MFcore;
 // ROOM *MFhead;
@@ -258,6 +259,7 @@ void setupMapFactory() {
     factory = (MAP *) malloc(sizeof(MAP));
     factory->initialRoom = createRoom(0, width, depth);
 
+    firstRoom = factory->initialRoom;
     // Snowman
     place(factory->initialRoom, scSnowman, 0.0, 3, -1);
 

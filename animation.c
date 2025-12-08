@@ -42,6 +42,7 @@ long startTime = 0.0;
 float sceneTime = 0.0f;
 long beforeSceneTime = 0.0;
 
+MAP *actualMap;;
 ROOM *actualRoom;
 int isAsking = 0;
 
@@ -51,7 +52,8 @@ void animation();
 void initGL();
 void setupSceneLighting();
 void drawTestSceneObjects();
-void drawMap(MAP *map);
+void drawRoom(ROOM *room);
+void drawMultipleRooms();
 void setupTextures();
 void keyboard(unsigned char key, int x, int y);
 void reshapeMain(int w, int h);
@@ -74,6 +76,8 @@ int main(int argc, char **argv) {
     // map setup
     setupMapTest();
     setupMapFactory();  
+
+    actualMap = factory;
 
     actualRoom = factory->initialRoom;
 
@@ -222,14 +226,12 @@ void drawTestSceneObjects() {
 
 }
 
-void drawMap(MAP *map) {
-    if (!map || !map->initialRoom) return;
+void drawRoom(ROOM *room) {    
+    TILE **tiles = (room->tileArray); 
     
-    TILE **tiles = (actualRoom->tileArray); 
-    
-    int mapWidth = actualRoom->width * 2 + 1;
-    int mapDepth = actualRoom->depth * 2 + 1;
-    int totalTiles = mapWidth * mapDepth;
+    int roomWidth = room->width * 2 + 1;
+    int roomDepth = room->depth * 2 + 1;
+    int totalTiles = roomWidth * roomDepth;
 
     for (int i = 0; i < totalTiles; i++) {
         if (tiles[i] != NULL) { 
@@ -258,6 +260,9 @@ void drawMap(MAP *map) {
     }
 }
 
+void drawMultipleRooms() {
+}
+
 void displayMain() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.678, 0.847, 0.902, 1.0); 
@@ -271,7 +276,7 @@ void displayMain() {
     glMatrixMode(GL_MODELVIEW);
     
     // drawMap(test);
-    drawMap(factory);
+    drawRoom(actualRoom);
 
     glutSwapBuffers();
 }
@@ -288,8 +293,7 @@ void displaySecondary() {
 
     glMatrixMode(GL_MODELVIEW);
     
-    // drawMap(test);
-    drawMap(factory);
+    drawMultipleRooms();
 
     glutSwapBuffers();
 }

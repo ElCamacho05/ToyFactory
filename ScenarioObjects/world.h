@@ -37,6 +37,7 @@ extern ELEMENT *phantom;
 
 extern MAP *test;
 extern MAP *factory;
+extern ROOM *firstRoom;
 
 void setupPhantomElement();
 TILE *createTile(float position[]);
