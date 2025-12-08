@@ -50,6 +50,7 @@ CONNECTION *createConnection(ROOM *room);
 void linkRooms(ROOM *room1, ROOM *room2);
 void deleteConnections(ROOM *room);
 ROOM *createRoom(int id, int width, int depth);
+ROOM *getRoom(int id, ROOM *room);
 void place(ROOM *room, int elemID, float angle, float posX, float posZ);
 void setupMapTest();
 void setupMapFactory();

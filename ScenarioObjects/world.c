@@ -148,13 +148,13 @@ void linkRooms(ROOM *room1, ROOM *room2) {
     // one direction (XD)
     CONNECTION *newConn1 = createConnection(room2);
     if (!newConn1) return; 
-    newConn1->contRoom = room1;
+    newConn1->nextRoom = room1->sideRooms;
     room1->sideRooms = newConn1;
 
     // other direction
     CONNECTION *newConn2 = createConnection(room1);
     if (!newConn2) return;
-    newConn2->contRoom = room2;
+    newConn2->nextRoom = room2->sideRooms;
     room2->sideRooms = newConn2;
 }
 
@@ -168,6 +168,7 @@ void deleteConnections(ROOM *room) {
     }
 }
 
+// Create a room with initialized 2 WIDTH x  2 DEPTH size
 ROOM *createRoom(int id, int width, int depth) {
     ROOM *newRoom = (ROOM *) malloc(sizeof(ROOM));
 
@@ -179,6 +180,21 @@ ROOM *createRoom(int id, int width, int depth) {
     newRoom->sideRooms = NULL;
 
     return newRoom;
+}
+
+// obtains a room from the list of adjacent rooms
+ROOM *getRoom(int id, ROOM *room) {
+    CONNECTION *list = room->sideRooms;
+
+    while(list) {
+        if (list->contRoom->id == id){
+            printf("Room Found\n");
+            return list->contRoom;
+        }
+        list = list->nextRoom;
+    }
+
+    printf("Not found\n");
 }
 
 void place(ROOM *room, int elemID, float angle, float posX, float posZ) {
@@ -242,8 +258,47 @@ void setupMapFactory() {
     factory = (MAP *) malloc(sizeof(MAP));
     factory->initialRoom = createRoom(0, width, depth);
 
-    place(factory->initialRoom, scChair, 0.0, 2, 4);
-    place(factory->initialRoom, scRoboticArm, 0.0, 0.0, 0.0);
+    // Snowman
+    place(factory->initialRoom, scSnowman, 0.0, 3, -1);
 
+    // Start Machine
+    place(factory->initialRoom, scStartM, 0.0, 0, 0);
+
+    // Robotic Arm
+    place(factory->initialRoom, scRoboticArm, 180.0, 3, 1);
+
+    // Christmas Tree
+    place(factory->initialRoom, scChristmasTree, 0.0, -3, -3);
+
+    // Walls
+    place(factory->initialRoom, scWall, 0.0, 4, -4);
+    place(factory->initialRoom, scWall, 0.0, 3, -4);
+    place(factory->initialRoom, scDoor, 0.0, 2, -4);
+    place(factory->initialRoom, scWall, 0.0, 1, -4);
+    place(factory->initialRoom, scWindow, 0.0, 0, -4);
+    place(factory->initialRoom, scWindow, 0.0, -1, -4);
+    place(factory->initialRoom, scWall, 0.0, -2, -4);
+    place(factory->initialRoom, scWall, 0.0, -3, -4);
+
+    // Chair
+    place(factory->initialRoom, scChair, 0.0, -3, 1);
+
+    // Table
+    place(factory->initialRoom, scTable, 0.0, -3, 2);
+
+    // Lamp
+    place(factory->initialRoom, scLamp, 0.0, -3, 2);
+
+    // Walls (X = -4, Z [-3,3])
+    for (int z = -3; z <= 4; z++) {
+        place(factory->initialRoom, scWall, 90.0, -4, z);
+    }
+
+
+    ROOM *Room2 = createRoom(1, width, depth);
+    linkRooms(factory->initialRoom, Room2);
+
+    place(Room2, scChair, 0.0, 2, 4);
+    place(Room2, scRoboticArm, 0.0, 0.0, 0.0);
 }
 

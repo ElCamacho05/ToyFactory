@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "ScenarioObjects/scenario.h"
 #include "ScenarioObjects/world.h"
@@ -39,6 +40,8 @@ long startTime = 0.0;
 float sceneTime = 0.0f;
 long beforeSceneTime = 0.0;
 
+ROOM *actualRoom;
+
 void display();
 void animation();
 void initGL();
@@ -63,6 +66,8 @@ int main(int argc, char **argv) {
     // map setup
     setupMapTest();
     setupMapFactory();  
+
+    actualRoom = factory->initialRoom;
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
 
@@ -196,8 +201,6 @@ void drawTestSceneObjects() {
 
 void drawMap(MAP *map) {
     if (!map || !map->initialRoom) return;
-
-    ROOM *actualRoom = map->initialRoom;
     
     TILE **tiles = (actualRoom->tileArray); 
     
@@ -244,8 +247,8 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
     
-    drawMap(test);
-    // drawMap(factory);
+    // drawMap(test);
+    drawMap(factory);
 
     glutSwapBuffers();
 }
@@ -293,6 +296,16 @@ void keyboard(unsigned char key, int x, int y) {
 
     else if (key == 'x' || key == 'X') {
         viewWidth += 0.1;
+    }
+
+    // Initial room. Main Menu
+    if (isdigit(key)) {
+        ROOM *newRoom = getRoom(1, actualRoom);
+        if (newRoom) actualRoom = newRoom;
+
+        else {
+            printf("Room %s not found (404)\n", key);
+        }
     }
 
     else {
