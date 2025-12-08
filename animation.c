@@ -27,7 +27,8 @@ int secondaryWindow;
 float camPosition[]= {1.0f, 1.0f, 1.0f};
 float camPointTo[]= {0.0f, 0.0f, 0.0f};
 
-float viewWidth = 5.0f;
+float viewWidthMain = 5.0f;
+float viewWidthSecondary = 25.0f;
 float aspectRatio = 1.0f;
 
 float speed = 0.5f;     
@@ -51,10 +52,11 @@ void displaySecondary();
 void animation();
 void initGL();
 void setupSceneLighting();
-void drawTestSceneObjects();
 void drawRoom(ROOM *room);
-void drawMultipleRooms();
+void drawTreeRecursive(ROOM *room, float x, float z, float xGap, float zGap);
+void drawMultipleRooms(ROOM *root, float xSpace, float zSpace);
 void setupTextures();
+void drawCurrentRoomBorder(ROOM *room);
 void keyboard(unsigned char key, int x, int y);
 void reshapeMain(int w, int h);
 void reshapeSecondary(int w, int h);
@@ -64,16 +66,22 @@ int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
+
+    /*
+    PRIMARY ROOM
+    */
     glutInitWindowSize(960, 960); 
     glutInitWindowPosition(0, 0);
     mainWindow = glutCreateWindow("Christmas Factory - Main");
 
     initGL();
     setupTextures();
+
+    // lightning and lists are initialized globally
     setupSceneLighting();
     scInitLists();
 
-    // map setup
+    // map setup for primary window
     setupMapTest();
     setupMapFactory();  
 
@@ -92,9 +100,16 @@ int main(int argc, char **argv) {
     SECONDARY ROOM
     */
 
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(960, 960); 
     glutInitWindowPosition(961, 0);
     secondaryWindow = glutCreateWindow("Christmas Factory - Main");
+
+    // map setup for secondary window
+    initGL();
+    setupTextures();
+    setupSceneLighting();
+    scInitLists();
 
     glutDisplayFunc(displaySecondary);
     glutIdleFunc(animation);
@@ -134,96 +149,29 @@ void setupTextures() {
     blockyGold = loadTexture("DrawUtils/Textures/Files/blocky-gold.png");
 }
 
-void drawTestSceneObjects() {
-    int x_range = 3;
-    int z_range = 3;
+void drawCurrentRoomBorder(ROOM *room) {
+    if (!room) return;
 
-    // draw example tile map
-    for (int x=-x_range; x <= x_range; x++) {
-        for (int z=-z_range; z <= z_range; z++) {
-            glPushMatrix();
-                glTranslatef(x, 0.0, z);
-                scDrawMapTile(&matWhiteWall, whitePlanksTexture);
+    glDisable(GL_LIGHTING); 
+    glDisable(GL_TEXTURE_2D);
+    glLineWidth(3.0f);
+    glColor3f(1.0f, 0.0f, 0.0f);
 
-            glPopMatrix();
-        }
-        glPushMatrix();
-            glRotatef(90.0, 0.0, 1.0, 0.0);
-            glTranslatef(x, 0.0, -4.0);
-            glPushMatrix();
-            scDrawWall();
-        glPopMatrix();
-    }
+    float w = (float)room->width + 0.5f;
+    float d = (float)room->depth + 0.5f;
+    float y = 0.0f;
 
-    glPushMatrix();
-        glTranslatef(-2.0, 1.0, 2.0);
-        scDrawLamp();
-    glPopMatrix();
+    glLineWidth(10.0f);
 
-    glPushMatrix();
-        glTranslatef(-2.0, 0.0, 1.0);
-        scDrawChair();
-    glPopMatrix();
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(-w, y, -d);
+        glVertex3f( w, y, -d);
+        glVertex3f( w, y,  d);
+        glVertex3f(-w, y,  d);
+    glEnd();
 
-    glPushMatrix();
-        glTranslatef(-2.0, 0.0, 2.0);
-        scDrawTable();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(-3.0, 0.0, -4.0);
-        scDrawWall();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(-2.0, 0.0, -4.0);
-        scDrawWall();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(-1.0, 0.0, -4.0);
-        scDrawWindow();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(0.0, 0.0, -4.0);
-        scDrawWindow();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(1.0, 0.0, -4.0);
-        scDrawWall();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(2.0, 0.0, -4.0);
-        scDrawDoor();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(3.0, 0.0, -4.0);
-        scDrawWall();
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslatef(-3.0, 0.0, -3.0);
-        scDrawChristmasTree();
-    glPopMatrix();
-
-    glPushMatrix();
-        // glTranslatef(-1.0, 0.0, -1.0);
-        glRotatef(90.0, 0.0, 1.0, 0.0);
-        scDrawFunnel();
-    glPopMatrix();
-
-    scDrawStartM();
-    scDrawConveyorBelt();
-
-    glPushMatrix();
-        glTranslatef(3.0, 0.0, -1.0);
-        scDrawSnowman();
-    glPopMatrix();
-
+    glEnable(GL_LIGHTING);
+    glColor3f(1.0f, 1.0f, 1.0f);
 }
 
 void drawRoom(ROOM *room) {    
@@ -260,12 +208,96 @@ void drawRoom(ROOM *room) {
     }
 }
 
-void drawMultipleRooms() {
+// thanks gemini GOD
+void drawTreeRecursive(ROOM *room, float x, float z, float xGap, float zGap) {
+    room->visited = 1; // Marcar como dibujado
+
+    // 1. DIBUJAR LA SALA ACTUAL
+    glPushMatrix();
+        glTranslatef(x, 0.0, z);
+        
+        // Dibujar el contenido de la sala
+        drawRoom(room);
+        
+        if (room == actualRoom) {
+            drawCurrentRoomBorder(room);
+        }
+    glPopMatrix();
+
+    // 2. PREPARAR PARA DIBUJAR HIJOS
+    
+    // Contar cuántos hijos válidos hay (no visitados)
+    CONNECTION *c = room->sideRooms;
+    int validChildren = 0;
+    while(c) {
+        if (!c->contRoom->visited) validChildren++;
+        c = c->nextRoom;
+    }
+
+    if (validChildren == 0) return;
+
+    // --- CÁLCULO DE POSICIONES (ROTADO 90 GRADOS) ---
+
+    // A. El "Suelo" del siguiente nivel está a la DERECHA (X positivo)
+    // Posición X del padre + Ancho del padre + Gap + (un poco extra para llegar al centro del hijo)
+    // Usamos (room->width * 2 + 1) para saltar toda la sala actual
+    float nextX = x + xGap + (room->width * 2 + 1); 
+    
+    // B. Calcular dónde empieza el primer hijo (ARRIBA en el eje Z) para centrarlos verticalmente
+    // Estimamos que cada hijo ocupa (profundidad_sala + gap)
+    // Centramos el grupo en Z relativo al padre
+    float startZ = z - (validChildren * (10.0f + zGap)) / 2.0f; 
+
+    float currentZ = startZ;
+
+    c = room->sideRooms;
+    while (c) {
+        ROOM *child = c->contRoom;
+        
+        if (!child->visited) { // Es un hijo
+            
+            // Dibujar línea conectora (Cable / Pasillo)
+            glDisable(GL_LIGHTING);
+            glDisable(GL_TEXTURE_2D);
+            glColor3f(1.0, 1.0, 0.0); // Amarillo
+            glLineWidth(2.0);
+            glBegin(GL_LINES);
+                // Desde el borde DERECHO del padre
+                glVertex3f(x + room->width, 1.0, z); 
+                // Al borde IZQUIERDO del hijo
+                glVertex3f(nextX - child->width, 1.0, currentZ); 
+            glEnd();
+            glEnable(GL_LIGHTING);
+            glColor3f(1.0, 1.0, 1.0);
+
+            // Llamada recursiva (Avanzamos en X, distribuimos en Z)
+            drawTreeRecursive(child, nextX, currentZ, xGap, zGap);
+            
+            // Mover Z para el siguiente hermano (Hacia ABAJO en el mapa)
+            // Usamos la profundidad física del hijo + el espacio
+            currentZ += (child->depth * 2 + 1) + zGap + 5.0f; 
+        }
+        c = c->nextRoom;
+    }
+}
+
+void drawMultipleRooms(ROOM *rootRoom, float xSpace, float zSpace) {
+    if (!rootRoom) return;
+
+    if (factory && factory->initialRoom) {
+        resetGraphFlags(factory->initialRoom);
+    } else {
+        resetGraphFlags(rootRoom); 
+    }
+
+    ROOM *startNode = (factory && factory->initialRoom) ? factory->initialRoom : rootRoom;
+    
+    drawTreeRecursive(startNode, 0.0f, 0.0f, xSpace, zSpace);
 }
 
 void displayMain() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.678, 0.847, 0.902, 1.0); 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
 
@@ -282,8 +314,8 @@ void displayMain() {
 }
 
 void displaySecondary() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.678, 0.847, 0.902, 1.0); 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
 
@@ -293,7 +325,7 @@ void displaySecondary() {
 
     glMatrixMode(GL_MODELVIEW);
     
-    drawMultipleRooms();
+    drawMultipleRooms(firstRoom, 10.0f, 5.0f);
 
     glutSwapBuffers();
 }
@@ -336,11 +368,11 @@ void keyboard(unsigned char key, int x, int y) {
     }
 
     else if (key == 'z' || key == 'Z') {
-        viewWidth -= 0.1;
+        viewWidthMain -= 0.1;
     }
 
     else if (key == 'x' || key == 'X') {
-        viewWidth += 0.1;
+        viewWidthMain += 0.1;
     }
 
     // Initial room. Main Menu
@@ -371,12 +403,12 @@ void reshapeMain(int w, int h) {
     
     // glOrtho(left, right, bottom, top, near, far)
     if (w >= h) {
-        glOrtho(-viewWidth * aR, viewWidth * aR, 
-                -viewWidth, viewWidth, 
+        glOrtho(-viewWidthMain * aR, viewWidthMain * aR, 
+                -viewWidthMain, viewWidthMain, 
                 -100.0, 1000.0);
     } else {
-        glOrtho(-viewWidth, viewWidth, 
-                -viewWidth / aR, viewWidth / aR, 
+        glOrtho(-viewWidthMain, viewWidthMain, 
+                -viewWidthMain / aR, viewWidthMain / aR, 
                 -100.0, 1000.0);
     }
     
@@ -391,16 +423,16 @@ void reshapeSecondary(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
-    float aR = (float)w / (float)h;
+    float aR = (float)w / (float)h; // aspect ratio
     
     // glOrtho(left, right, bottom, top, near, far)
     if (w >= h) {
-        glOrtho(-viewWidth * aR, viewWidth * aR, 
-                -viewWidth, viewWidth, 
+        glOrtho(-viewWidthSecondary * aR, viewWidthSecondary * aR, 
+                -viewWidthSecondary, viewWidthSecondary, 
                 -100.0, 1000.0);
     } else {
-        glOrtho(-viewWidth, viewWidth, 
-                -viewWidth / aR, viewWidth / aR, 
+        glOrtho(-viewWidthSecondary, viewWidthSecondary, 
+                -viewWidthSecondary / aR, viewWidthSecondary / aR, 
                 -100.0, 1000.0);
     }
     

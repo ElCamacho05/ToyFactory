@@ -177,6 +177,7 @@ ROOM *createRoom(int id, int width, int depth) {
     newRoom->id = id;
     newRoom->width = width;
     newRoom->depth = depth;
+    newRoom->visited = 0;
     newRoom->tileArray = createTileMap(width, depth);
     newRoom->sideRooms = NULL;
 
@@ -198,6 +199,44 @@ ROOM *getRoom(int id, ROOM *room) {
     printf("Not found\n");
 }
 
+// Obtains the width (sum) of all of the adjacent nodes
+float getTreeWidth(ROOM *room, float xGap) {
+    if (!room || room->visited) return 0;
+    room->visited = 1;
+
+    float totalWidth = 0.0f;
+    int hasChildren = 0;
+
+    CONNECTION *conn = room->sideRooms;
+    while (conn) {
+        if (!conn->contRoom->visited) {
+            float childW = getTreeWidth(conn->contRoom, xGap);
+            totalWidth += childW;
+            hasChildren = 1;
+        }
+        conn = conn->nextRoom;
+    }
+
+    if (!hasChildren) {
+        return (room->width * 2 + 1) + xGap;
+    }
+
+    return totalWidth;
+}
+
+// reset all the flags from these room and so
+void resetGraphFlags(ROOM *room) {
+    if (!room || !room->visited) return;
+    room->visited = 0;
+    
+    CONNECTION *conn = room->sideRooms;
+    while (conn) {
+        resetGraphFlags(conn->contRoom);
+        conn = conn->nextRoom;
+    }
+}
+
+// utility function to simplify adding elements to a room
 void place(ROOM *room, int elemID, float angle, float posX, float posZ) {
     int width = room->width;
     int depth = room->depth;
@@ -208,6 +247,7 @@ void place(ROOM *room, int elemID, float angle, float posX, float posZ) {
     insertElement(&tile, elem);
 }
 
+// map test
 void setupMapTest() {
     int width = 4;
     int depth = 4;
@@ -251,6 +291,7 @@ void setupMapTest() {
     }
 }
 
+// main map: Factory
 void setupMapFactory() {
     int width = 4;
     int depth = 4;
@@ -297,10 +338,23 @@ void setupMapFactory() {
     }
 
 
-    ROOM *Room2 = createRoom(1, width, depth);
-    linkRooms(factory->initialRoom, Room2);
+    ROOM *Room10 = createRoom(1, width, depth);
+    linkRooms(factory->initialRoom, Room10);
 
-    place(Room2, scChair, 0.0, 2, 4);
-    place(Room2, scRoboticArm, 0.0, 0.0, 0.0);
+    place(Room10, scChair, 0.0, 2, 4);
+    place(Room10, scRoboticArm, 0.0, 0.0, 0.0);
+
+
+    ROOM *Room20 = createRoom(1, width, depth);
+    linkRooms(Room10, Room20);
+
+    place(Room20, scChair, 0.0, 2, 4);
+    place(Room20, scRoboticArm, 0.0, 0.0, 0.0);
+
+    ROOM *Room21 = createRoom(1, width, depth);
+    linkRooms(Room10, Room21);
+
+    place(Room21, scChair, 0.0, 2, 4);
+    place(Room21, scRoboticArm, 0.0, 0.0, 0.0);
 }
 

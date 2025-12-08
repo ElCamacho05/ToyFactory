@@ -26,6 +26,7 @@ typedef struct Room { // a graph of room
     TILE **tileArray;
     int width;
     int depth;
+    int visited; // because its a bidirectional graph, we dont want to visit it again
     CONNECTION *sideRooms; // contiguous room
 } ROOM;
 
@@ -52,6 +53,8 @@ void linkRooms(ROOM *room1, ROOM *room2);
 void deleteConnections(ROOM *room);
 ROOM *createRoom(int id, int width, int depth);
 ROOM *getRoom(int id, ROOM *room);
+float getTreeWidth(ROOM *room, float xGap);
+void resetGraphFlags(ROOM *room);
 void place(ROOM *room, int elemID, float angle, float posX, float posZ);
 void setupMapTest();
 void setupMapFactory();
