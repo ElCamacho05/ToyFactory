@@ -21,6 +21,27 @@ GLuint scWindow = 0;
 GLuint scDoor = 0;
 // characters
 GLuint scSnowman = 0;
+/*
+MAIN CHARACTER: ROBOT
+*/
+GLuint scTestRobot = 0;
+    GLuint scRobotHeadNormal = 0;
+    GLuint scRobotTorsoThin = 0;
+    GLuint scRobotTorsoThick = 0;
+    GLuint scRobotArmThin = 0;
+    GLuint scRobotArmThick = 0;
+    GLuint scRobotLegSimple = 0;
+    GLuint scRobotLegArmored = 0;
+    GLuint scRobotBootSimple = 0;
+    GLuint scRobotBootThruster = 0;
+    GLuint scRobotBackpack = 0;
+    GLuint scRobotJetpack = 0;
+    GLuint scRobotAccGlasses = 0;
+    GLuint scRobotAccMask = 0;
+    GLuint scToolLaser = 0;
+    GLuint scToolHammer = 0;
+    GLuint scToolSword = 0;
+    GLuint scToolLightsaber = 0;
 
 int time = 0;
 
@@ -41,6 +62,8 @@ void scInitLists() {
     scInitDoor();
     // characters
     scInitSnowman();
+    scInitRobotParts();
+    scInitTestRobot();
 }
 
 
@@ -775,4 +798,381 @@ void scInitSnowman() {
 
 void scDrawSnowman() {
     glCallList(scSnowman);
+}
+
+
+/*
+ROBOT
+*/
+void scInitRobotParts() {
+    // -- HEADS --
+    scRobotHeadNormal = glGenLists(1);
+    glNewList(scRobotHeadNormal, GL_COMPILE);
+        applyMaterial(&matPlastic);
+        glPushMatrix();
+            glScalef(0.5f, 0.5f, 0.5f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        applyMaterial(&matPlasticYellow);
+        glPushMatrix();
+            glTranslatef(-0.15f, 0.05f, 0.25f);
+            glutSolidSphere(0.05, 10, 10);
+        glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0.15f, 0.05f, 0.25f);
+            glutSolidSphere(0.05, 10, 10);
+        glPopMatrix();
+    glEndList();
+
+    // --- CORE ---
+    
+    // think chest
+    scRobotTorsoThin = glGenLists(1);
+    glNewList(scRobotTorsoThin, GL_COMPILE);
+        applyMaterial(&matPlasticBlue);
+        glPushMatrix();
+            glScalef(0.4f, 0.6f, 0.3f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // thick chest
+    scRobotTorsoThick = glGenLists(1);
+    glNewList(scRobotTorsoThick, GL_COMPILE);
+        applyMaterial(&matPlasticRed);
+        glPushMatrix();
+            glScalef(0.7f, 0.6f, 0.5f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        applyMaterial(&matMetalSilver);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.26f);
+            glScalef(0.4f, 0.3f, 0.05f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // -- ARMS --
+    // thin arm
+    scRobotArmThin = glGenLists(1);
+    glNewList(scRobotArmThin, GL_COMPILE);
+        applyMaterial(&matPlastic);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.3f, 0.0f);
+            glScalef(0.15f, 0.6f, 0.15f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // thick arm
+    scRobotArmThick = glGenLists(1);
+    glNewList(scRobotArmThick, GL_COMPILE);
+
+    applyMaterial(&matMetal);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.0f); 
+            glScalef(0.35f, 0.35f, 0.35f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        applyMaterial(&matPlasticRed);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.4f, 0.0f);
+            glScalef(0.25f, 0.5f, 0.25f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // --- LEGS ---
+    // simple leg
+    scRobotLegSimple = glGenLists(1);
+    glNewList(scRobotLegSimple, GL_COMPILE);
+        applyMaterial(&matPlastic);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.3f, 0.0f);
+            glScalef(0.2f, 0.6f, 0.2f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // super Leg
+    scRobotLegArmored = glGenLists(1);
+    glNewList(scRobotLegArmored, GL_COMPILE);
+        applyMaterial(&matPlasticBlue);
+
+        glPushMatrix();
+            glTranslatef(0.0f, -0.3f, 0.0f);
+            glScalef(0.25f, 0.6f, 0.3f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        
+        applyMaterial(&matMetalSilver);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.3f, 0.16f);
+            glScalef(0.26f, 0.15f, 0.05f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // -- BOOTS --
+    // simple boots
+    scRobotBootSimple = glGenLists(1);
+    glNewList(scRobotBootSimple, GL_COMPILE);
+        applyMaterial(&matRubber);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.1f, 0.05f);
+            glScalef(0.22f, 0.2f, 0.3f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // Propulsion boots
+    scRobotBootThruster = glGenLists(1);
+    glNewList(scRobotBootThruster, GL_COMPILE);
+        applyMaterial(&matMetal);
+
+        glPushMatrix();
+            glTranslatef(0.0f, -0.15f, 0.0f);
+            glScalef(0.35f, 0.3f, 0.35f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();       
+        
+        applyMaterial(&matPlasticYellow);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.35f, 0.0f);
+            glScalef(0.15f, 0.1f, 0.15f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // -- BACK ACCESSORIES --
+    
+    // backpack
+    scRobotBackpack = glGenLists(1);
+    glNewList(scRobotBackpack, GL_COMPILE);
+        applyMaterial(&matBrickBrown);
+
+        glPushMatrix();
+            glScalef(0.4f, 0.5f, 0.2f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(0.0f, -0.1f, 0.12f);
+            glScalef(0.3f, 0.2f, 0.1f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // Jetpack
+    scRobotJetpack = glGenLists(1);
+    glNewList(scRobotJetpack, GL_COMPILE);
+        applyMaterial(&matMetalSilver);
+
+        glPushMatrix();
+            glTranslatef(-0.15f, 0.0f, 0.0f);
+            glScalef(0.15f, 0.6f, 0.15f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(0.15f, 0.0f, 0.0f);
+            glScalef(0.15f, 0.6f, 0.15f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        applyMaterial(&matDarkMetal);
+        glPushMatrix();
+            glScalef(0.4f, 0.1f, 0.1f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // -- HEAD ACCESSORIES --
+
+    // Visor/glasses
+    scRobotAccGlasses = glGenLists(1);
+    glNewList(scRobotAccGlasses, GL_COMPILE);
+        applyMaterial(&matPlasticRed);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.0f);
+            glScalef(0.52f, 0.1f, 0.05f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // Mask
+    scRobotAccMask = glGenLists(1);
+    glNewList(scRobotAccMask, GL_COMPILE);
+        applyMaterial(&matDarkMetal);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.15f, 0.26f);
+            glScalef(0.4f, 0.2f, 0.05f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0.0f, -0.15f, 0.3f);
+            glScalef(0.1f, 0.1f, 0.1f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // --- TOOLS ---
+
+    // Laser gun
+    scToolLaser = glGenLists(1);
+    glNewList(scToolLaser, GL_COMPILE);
+        applyMaterial(&matPlasticBlue);
+        glPushMatrix();
+            glTranslatef(0.0f, -0.05f, 0.0f);
+            glScalef(0.1f, 0.05f, 0.1f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0.0f, 0.1f, 0.2f);
+            glScalef(0.12f, 0.12f, 0.5f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // Hammer
+    scToolHammer = glGenLists(1);
+    glNewList(scToolHammer, GL_COMPILE);
+        applyMaterial(&matBrickBrown);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.2f, 0.0f);
+            glScalef(0.08f, 0.6f, 0.08f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        applyMaterial(&matMetal);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.5f, 0.0f);
+            glScalef(0.3f, 0.2f, 0.15f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // Sword
+    scToolSword = glGenLists(1);
+    glNewList(scToolSword, GL_COMPILE);
+        applyMaterial(&matDarkMetal);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.1f, 0.0f);
+            glScalef(0.08f, 0.2f, 0.08f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        applyMaterial(&matMetalGold);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.25f, 0.0f);
+            glScalef(0.3f, 0.05f, 0.1f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        applyMaterial(&matMetalSilver);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.6f, 0.0f);
+            glScalef(0.06f, 0.7f, 0.02f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+
+    // Lightsaber
+    scToolLightsaber = glGenLists(1);
+    glNewList(scToolLightsaber, GL_COMPILE);
+        applyMaterial(&matMetal);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.0f, 0.0f);
+            glRotatef(-90, 1,0,0);
+            utDrawCylinder(0.05f, 0.25f, 8, &matMetal);
+        glPopMatrix();
+        glDisable(GL_LIGHTING);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.25f, 0.0f);
+            glRotatef(-90, 1,0,0);
+            gluCylinder(gluNewQuadric(), 0.04, 0.04, 0.8, 8, 1);
+        glPopMatrix();
+        glEnable(GL_LIGHTING);
+    glEndList();
+}
+
+void scInitTestRobot() {
+    scTestRobot = glGenLists(1);
+    glNewList(scTestRobot, GL_COMPILE);
+
+    // Core
+    glPushMatrix();
+        glTranslatef(0.0f, 0.9f, 0.0f); 
+
+        glCallList(scRobotTorsoThin);
+        // head
+        glPushMatrix();
+            glTranslatef(0.0f, 0.55f, 0.0f);
+            glCallList(scRobotHeadNormal);
+            // glasses
+            glCallList(scRobotAccGlasses);
+        glPopMatrix();
+
+        // backpack
+        glPushMatrix();
+            glTranslatef(0.0f, 0.1f, -0.15f);
+            glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+            glCallList(scRobotJetpack); 
+        glPopMatrix();
+
+        // arms
+        // left
+        glPushMatrix();
+            glTranslatef(-0.28f, 0.25f, 0.0f);
+            glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+            glCallList(scRobotArmThin);
+            // tool
+            glPushMatrix();
+                glTranslatef(0.0f, -0.6f, 0.0f);
+                glRotatef(0.0f, 1.0f, 0.0f, 0.0f);
+                glCallList(scToolLaser);
+            glPopMatrix();
+        glPopMatrix();
+
+        // Right
+        glPushMatrix();
+            glTranslatef(0.28f, 0.25f, 0.0f);
+            glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+            glRotatef(-45.0f, 1.0f, 0.0f, 0.0f);
+            glCallList(scRobotArmThin);
+             glPushMatrix();
+                glTranslatef(0.0f, -0.6f, 0.0f);
+                glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+                glCallList(scToolSword);
+            glPopMatrix();
+        glPopMatrix();
+
+        // legs
+        // left
+        glPushMatrix();
+            glTranslatef(-0.15f, -0.3f, 0.0f);
+            glCallList(scRobotLegSimple);
+            // boots
+            glPushMatrix();
+                glTranslatef(0.0f, -0.6f, 0.0f);
+                glCallList(scRobotBootThruster);
+            glPopMatrix();
+        glPopMatrix();
+        // right
+        glPushMatrix();
+            glTranslatef(0.15f, -0.3f, 0.0f);
+            glCallList(scRobotLegSimple);
+            // boots
+            glPushMatrix();
+                glTranslatef(0.0f, -0.6f, 0.0f);
+                glCallList(scRobotBootThruster);
+            glPopMatrix();
+        glPopMatrix();
+
+    glPopMatrix();
+    glEndList();
+}
+
+void scDrawTestRobot() {
+    glCallList(scTestRobot);
 }

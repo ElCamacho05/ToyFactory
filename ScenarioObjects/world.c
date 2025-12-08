@@ -321,6 +321,9 @@ void setupMapFactory() {
     factory->initialRoom = createRoom(0, width, depth);
 
     firstRoom = factory->initialRoom;
+    // our hero!!!
+    place(factory->initialRoom, scTestRobot, 90.0, 2.0, 2.0);
+
     // Snowman
     place(factory->initialRoom, scSnowman, 0.0, 3, -1);
 
@@ -363,7 +366,6 @@ void setupMapFactory() {
 
     place(Room10, scChair, 0.0, 2, 4);
     place(Room10, scRoboticArm, 0.0, 0.0, 0.0);
-
 
     ROOM *Room20 = createRoom(1, width, depth);
     linkRooms(Room10, Room20);

@@ -75,6 +75,9 @@ void scInitLists();
     void scInitDoor();
     // characters
     void scInitSnowman();
+    void scInitRobotParts();
+    void scInitTestRobot();
+
 /*
 DRAWING
 */
@@ -94,7 +97,7 @@ void scDrawWindow();
 void scDrawDoor();
 // characters
 void scDrawSnowman();
-
+void scDrawTestRobot();
 
 // furniture
 extern GLuint scMapTile;
@@ -113,7 +116,34 @@ extern GLuint scWindow;
 extern GLuint scDoor;
 // characters
 extern GLuint scSnowman;
-
+/*
+MAIN CHARACTER: ROBOT
+*/
+extern GLuint scTestRobot;
+    extern GLuint scRobotHeadNormal;
+    // Torsos
+    extern GLuint scRobotTorsoThin;
+    extern GLuint scRobotTorsoThick;
+    // Arms
+    extern GLuint scRobotArmThin;
+    extern GLuint scRobotArmThick;
+    // Legs
+    extern GLuint scRobotLegSimple;
+    extern GLuint scRobotLegArmored;
+    // Boots
+    extern GLuint scRobotBootSimple;
+    extern GLuint scRobotBootThruster;
+    // Back
+    extern GLuint scRobotBackpack;
+    extern GLuint scRobotJetpack;
+    // Head Acc
+    extern GLuint scRobotAccGlasses;
+    extern GLuint scRobotAccMask;
+    // Tools
+    extern GLuint scToolLaser;
+    extern GLuint scToolHammer;
+    extern GLuint scToolSword;
+    extern GLuint scToolLightsaber;
 
 extern int time;
 
