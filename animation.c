@@ -21,6 +21,8 @@
 #define PI 3.14159265359
 #define DEG2RAD(x) ((x) * PI / 180.0f)
 
+int mainWindow;
+int secondaryWindow;
 
 float camPosition[]= {1.0f, 1.0f, 1.0f};
 float camPointTo[]= {0.0f, 0.0f, 0.0f};
@@ -41,8 +43,10 @@ float sceneTime = 0.0f;
 long beforeSceneTime = 0.0;
 
 ROOM *actualRoom;
+int isAsking = 0;
 
-void display();
+void displayMain();
+void displaySecondary();
 void animation();
 void initGL();
 void setupSceneLighting();
@@ -50,13 +54,17 @@ void drawTestSceneObjects();
 void drawMap(MAP *map);
 void setupTextures();
 void keyboard(unsigned char key, int x, int y);
-void reshape(int w, int h);
+void reshapeMain(int w, int h);
+void reshapeSecondary(int w, int h);
+
 
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 600); 
-    glutCreateWindow("Christmas Factory");
+
+    glutInitWindowSize(960, 960); 
+    glutInitWindowPosition(0, 0);
+    mainWindow = glutCreateWindow("Christmas Factory - Main");
 
     initGL();
     setupTextures();
@@ -71,11 +79,26 @@ int main(int argc, char **argv) {
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
 
-    glutDisplayFunc(display);
+    glutDisplayFunc(displayMain);
     glutIdleFunc(animation);
-    glutReshapeFunc(reshape);
+    glutReshapeFunc(reshapeMain);
     glutKeyboardFunc(keyboard);
+
+    /*
+    SECONDARY ROOM
+    */
+
+    glutInitWindowSize(960, 960); 
+    glutInitWindowPosition(961, 0);
+    secondaryWindow = glutCreateWindow("Christmas Factory - Main");
+
+    glutDisplayFunc(displaySecondary);
+    glutIdleFunc(animation);
+    glutReshapeFunc(reshapeSecondary);
+    glutKeyboardFunc(keyboard);
+
     glutMainLoop();
+
     return 0;
 }
 
@@ -235,7 +258,25 @@ void drawMap(MAP *map) {
     }
 }
 
-void display() {
+void displayMain() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.678, 0.847, 0.902, 1.0); 
+
+    glLoadIdentity();
+
+    gluLookAt(camPosition[X], camPosition[Y], camPosition[Z],
+              camPointTo[X], camPointTo[Y], camPointTo[Z],
+              0.0, 1.0, 0.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    
+    // drawMap(test);
+    drawMap(factory);
+
+    glutSwapBuffers();
+}
+
+void displaySecondary() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.678, 0.847, 0.902, 1.0); 
 
@@ -299,7 +340,7 @@ void keyboard(unsigned char key, int x, int y) {
     }
 
     // Initial room. Main Menu
-    if (isdigit(key)) {
+    if (isdigit(key) && isAsking) {
         ROOM *newRoom = getRoom(1, actualRoom);
         if (newRoom) actualRoom = newRoom;
 
@@ -314,7 +355,31 @@ void keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void reshape(int w, int h) {
+void reshapeMain(int w, int h) {
+    if (h == 0) h = 1;
+    
+    glViewport(0, 0, w, h);
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
+    float aR = (float)w / (float)h;
+    
+    // glOrtho(left, right, bottom, top, near, far)
+    if (w >= h) {
+        glOrtho(-viewWidth * aR, viewWidth * aR, 
+                -viewWidth, viewWidth, 
+                -100.0, 1000.0);
+    } else {
+        glOrtho(-viewWidth, viewWidth, 
+                -viewWidth / aR, viewWidth / aR, 
+                -100.0, 1000.0);
+    }
+    
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void reshapeSecondary(int w, int h) {
     if (h == 0) h = 1;
     
     glViewport(0, 0, w, h);
