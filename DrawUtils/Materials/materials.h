@@ -27,6 +27,8 @@ extern MATERIAL matMetalCopper;     // copper/bronze
 extern MATERIAL matMetalDull;       // dull/brushed metal
 
 extern MATERIAL matPlasticChristmasGreen;
+extern MATERIAL matChristmasRed;
+extern MATERIAL matChristmasGreen;
 extern MATERIAL matDarkMetal;       // Metal oscuro (Gabinete Turing, Armas)
 extern MATERIAL matBakelite;        // Baquelita rojiza (Rotores Enigma, Radios antiguas)
 extern MATERIAL matRubber;          // Caucho negro mate (Llantas)

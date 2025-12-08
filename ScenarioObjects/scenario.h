@@ -15,7 +15,8 @@ void scInitLists();
     void scInitChair();
     void scInitFunnel();
     void scInitStartM();
-
+    void scInitRoboticArm();
+    
     void scInitToyCar();
     void scInitRobotConstructorTorso();
     void scInitRobotExplorerTorso();
@@ -37,6 +38,7 @@ void scDrawTable();
 void scDrawChair();
 void scDrawFunnel();
 void scDrawStartM();
+void scDrawRoboticArm();
 // buildings
 void scDrawWall();
 void scDrawWindow();
@@ -55,6 +57,7 @@ extern GLuint scTable;
 extern GLuint scChair;
 extern GLuint scStartM;
 extern GLuint scFunnel;
+extern GLuint scRoboticArm;
 // buildings
 extern GLuint scWall;
 extern GLuint scWindow;

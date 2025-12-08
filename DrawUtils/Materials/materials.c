@@ -184,6 +184,20 @@ MATERIAL matPlasticChristmasGreen = {
     .shininess = 32.0f
 };
 
+MATERIAL matChristmasRed = {
+    {0.3f, 0.0f, 0.0f, 1.0f}, // Ambient
+    {0.9f, 0.1f, 0.1f, 1.0f}, // Diffuse
+    {0.8f, 0.6f, 0.6f, 1.0f}, // Specular
+    30.0f                     // Shininess
+};
+
+MATERIAL matChristmasGreen = {
+    {0.0f, 0.3f, 0.0f, 1.0f}, // Ambient
+    {0.1f, 0.8f, 0.1f, 1.0f}, // Diffuse
+    {0.6f, 0.8f, 0.6f, 1.0f}, // Specular
+    30.0f                     // Shininess
+};
+
 // ============================================================================
 // ENVIRONMENT MATERIALS
 // ============================================================================

@@ -224,7 +224,7 @@ void drawMap(MAP *map) {
                             glCallList(current->drawId);
                         }
                     glPopMatrix();
-                    height += 0.25;
+                    height += 1.0;
                     current = current->next;
                 }
             glPopMatrix();
@@ -245,6 +245,7 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
     
     drawMap(test);
+    // drawMap(factory);
 
     glutSwapBuffers();
 }

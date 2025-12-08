@@ -14,6 +14,7 @@ GLuint scTable = 0;
 GLuint scChair = 0;
 GLuint scStartM = 0;
 GLuint scFunnel = 0;
+GLuint scRoboticArm = 0;
 // buildings
 GLuint scWall = 0;
 GLuint scWindow = 0;
@@ -33,6 +34,7 @@ void scInitLists() {
     scInitChair();
     scInitFunnel();
     scInitStartM();
+    scInitRoboticArm();
     // buildings
     scInitWall();
     scInitWindow();
@@ -400,13 +402,24 @@ void scInitStartM() {
             glCallList(scFunnel);
         glPopMatrix();
 
-        glPushMatrix();
-            applyMaterial(&matPlasticRed);
-            glBegin(GL_TEXTURE_2D);
-            boundTexture(brickTexture);
+        applyMaterial(&matBrick);
+        glEnable(GL_TEXTURE_2D); 
+        boundTexture(brickTexture);
+            glPushMatrix();
                 glScalef(3.0, 2.0, 3.0);
                 utDrawTexturedCube(1.0);
-            glEnd();
+            glPopMatrix();
+
+            glPushMatrix();
+                glScalef(2, 6.0, 2);
+                utDrawTexturedCube(1.0);
+            glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
+
+        applyMaterial(&matRubber);
+        glPushMatrix();
+            glScalef(1, 6.01, 1);
+            utDrawTexturedCube(1.0);
         glPopMatrix();
     glEndList();
 }
@@ -461,6 +474,95 @@ void scInitRobotExplorerTorso() {
     
 }
 
+void scInitRoboticArm() {
+    scRoboticArm = glGenLists(1);
+    glNewList(scRoboticArm, GL_COMPILE);
+
+        // Base
+        applyMaterial(&matPlasticRed);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.1f, 0.0f);
+            glScalef(0.8f, 0.2f, 0.8f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // Rot axis
+        applyMaterial(&matPlasticGreen);
+        glPushMatrix();
+            glTranslatef(0.0f, 0.35f, 0.0f);
+            glScalef(0.4f, 0.3f, 0.4f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(0.0f, 0.4f, 0.0f); 
+
+            // BOTTOM
+            glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
+
+            applyMaterial(&matPlasticGreen);
+            glPushMatrix();
+                glScalef(0.25f, 0.25f, 0.3f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+
+            glTranslatef(0.0f, 0.4f, 0.0f); 
+            
+            applyMaterial(&matPlasticRed);
+            glPushMatrix();
+                glScalef(0.15f, 0.8f, 0.15f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+
+            // TOP
+            glTranslatef(0.0f, 0.4f, 0.0f);
+            glRotatef(95.0f, 1.0f, 0.0f, 0.0f); 
+            
+            applyMaterial(&matPlasticGreen);
+            glPushMatrix();
+                glScalef(0.2f, 0.2f, 0.25f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+
+            glTranslatef(0.0f, 0.35f, 0.0f);
+            
+            applyMaterial(&matPlasticRed);
+            glPushMatrix();
+                glScalef(0.12f, 0.7f, 0.12f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+
+            // GRIPPER
+            glTranslatef(0.0f, 0.35f, 0.0f);
+            glRotatef(40.0f, 1.0f, 0.0f, 0.0f);
+
+            // Wrist
+            applyMaterial(&matPlasticGreen);
+            glPushMatrix();
+                glScalef(0.2f, 0.15f, 0.3f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+
+            // fingers
+            applyMaterial(&matMetalGold);
+            glPushMatrix();
+                glTranslatef(-0.08f, 0.15f, 0.0f);
+                glScalef(0.05f, 0.3f, 0.1f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+
+            glPushMatrix();
+                glTranslatef(0.08f, 0.15f, 0.0f);
+                glScalef(0.05f, 0.3f, 0.1f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+        glPopMatrix();
+    glEndList();
+}
+
+void scDrawRoboticArm() {
+    glCallList(scRoboticArm);
+}
 
 /*
 ---------

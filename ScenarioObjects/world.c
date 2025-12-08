@@ -181,80 +181,56 @@ ROOM *createRoom(int id, int width, int depth) {
     return newRoom;
 }
 
+void place(ROOM *room, int elemID, float angle, float posX, float posZ) {
+    int width = room->width;
+    int depth = room->depth;
+    int rangeDepth = (depth * 2 + 1); // recalculate considering negative coords
+    int index = (posX + width) * rangeDepth + (posZ + depth);
+    TILE *tile = room->tileArray[index];
+    ELEMENT *elem = createElement(elemID, angle);
+    insertElement(&tile, elem);
+}
+
 void setupMapTest() {
     int width = 4;
     int depth = 4;
-    int rangeDepth = (depth * 2 + 1);
 
     test = (MAP *) malloc(sizeof(MAP));
     test->initialRoom = createRoom(0, width, depth);
 
-    int idx;
+    // Snowman
+    place(test->initialRoom, scSnowman, 0.0, 3, -1);
 
-    // Snowman (3, -1)
-    idx = (3 + width) * rangeDepth + (-1 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scSnowman, 0.0));
+    // Start Machine
+    place(test->initialRoom, scStartM, 0.0, 0, 0);
 
-    // ConveyorBelt (0, 0)
-    idx = (0 + width) * rangeDepth + (0 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scConveyorBelt, 0.0));
+    // Robotic Arm
+    place(test->initialRoom, scRoboticArm, 180.0, 3, 1);
 
-    // StartM (0, 0)
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scStartM, 0.0));
+    // Christmas Tree
+    place(test->initialRoom, scChristmasTree, 0.0, -3, -3);
 
-    // Funnel (0, 0)
-    // insertElement(&(test->initialRoom->tileArray[idx]), createElement(scFunnel, 90.0));
+    // Walls
+    place(test->initialRoom, scWall, 0.0, 3, -4);
+    place(test->initialRoom, scDoor, 0.0, 2, -4);
+    place(test->initialRoom, scWall, 0.0, 1, -4);
+    place(test->initialRoom, scWindow, 0.0, 0, -4);
+    place(test->initialRoom, scWindow, 0.0, -1, -4);
+    place(test->initialRoom, scWall, 0.0, -2, -4);
+    place(test->initialRoom, scWall, 0.0, -3, -4);
 
-    // Christmas Tree (-3, -3)
-    idx = (-3 + width) * rangeDepth + (-3 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scChristmasTree, 0.0));
+    // Chair
+    place(test->initialRoom, scChair, 0.0, -3, 1);
 
-    // Explicit Walls (Back row z=-4) - Reverse order of drawTestSceneObjects
-    
-    // Wall (3, -4)
-    idx = (3 + width) * rangeDepth + (-4 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scWall, 0.0));
+    // Table
+    place(test->initialRoom, scTable, 0.0, -3, 2);
 
-    // Door (2, -4)
-    idx = (2 + width) * rangeDepth + (-4 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scDoor, 0.0));
+    // Lamp
+    place(test->initialRoom, scLamp, 0.0, -3, 2);
 
-    // Wall (1, -4)
-    idx = (1 + width) * rangeDepth + (-4 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scWall, 0.0));
-
-    // Window (0, -4)
-    idx = (0 + width) * rangeDepth + (-4 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scWindow, 0.0));
-
-    // Window (-1, -4)
-    idx = (-1 + width) * rangeDepth + (-4 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scWindow, 0.0));
-
-    // Wall (-2, -4)
-    idx = (-2 + width) * rangeDepth + (-4 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scWall, 0.0));
-
-    // Wall (-3, -4)
-    idx = (-3 + width) * rangeDepth + (-4 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scWall, 0.0));
-
-    // Table (-2, 2)
-    idx = (-2 + width) * rangeDepth + (2 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scTable, 0.0));
-
-    // Chair (-2, 1)
-    idx = (-2 + width) * rangeDepth + (1 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scChair, 0.0));
-
-    // Lamp (-2, 2)
-    idx = (-2 + width) * rangeDepth + (2 + depth);
-    insertElement(&(test->initialRoom->tileArray[idx]), createElement(scLamp, 0.0));
-
-    // Loop Walls (z = -4)
-    for (int x = -3; x <= 3; x++) {
-        idx = (x + width) * rangeDepth + (-4 + depth);
-        insertElement(&(test->initialRoom->tileArray[idx]), createElement(scWall, 0.0));
+    // Walls (X = -4, Z [-3,3])
+    for (int z = -3; z <= 3; z++) {
+        place(test->initialRoom, scWall, 90.0, -4, z);
     }
 }
 
@@ -265,12 +241,9 @@ void setupMapFactory() {
 
     factory = (MAP *) malloc(sizeof(MAP));
     factory->initialRoom = createRoom(0, width, depth);
-    
-    int posX = 2, posZ = 4;
-    int index = (posX + width) * rangeDepth + (posZ + depth);
 
-    ELEMENT *newEl = createElement(scChair, 0.0);
+    place(factory->initialRoom, scChair, 0.0, 2, 4);
+    place(factory->initialRoom, scRoboticArm, 0.0, 0.0, 0.0);
 
-    insertElement(&(factory->initialRoom->tileArray[index]), newEl);
 }
 
