@@ -45,7 +45,11 @@ long beforeSceneTime = 0.0;
 
 MAP *actualMap;;
 ROOM *actualRoom;
+ROOM *nextRoom = NULL;
 int isAsking = 1;
+
+int screenChanging = 0;;
+float upElevation = 0.0;
 
 void displayMain();
 void displaySecondary();
@@ -184,6 +188,7 @@ void drawCurrentRoomBorder(ROOM *room) {
 }
 
 void drawRoom(ROOM *room) {    
+    if (!room) return;
     TILE **tiles = (room->tileArray); 
     
     int roomWidth = room->width * 2 + 1;
@@ -308,16 +313,23 @@ void displayMain() {
     glClearColor(0.678, 0.847, 0.902, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     gluLookAt(camPosition[X], camPosition[Y], camPosition[Z],
               camPointTo[X], camPointTo[Y], camPointTo[Z],
               0.0, 1.0, 0.0);
 
-    glMatrixMode(GL_MODELVIEW);
-    
-    // drawMap(test);
-    drawRoom(actualRoom);
+    glPushMatrix();
+        glTranslatef(0.0, upElevation, 0.0);
+        // drawMap(test);
+        drawRoom(actualRoom);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(0.0, upElevation-10.0f, 0.0);
+        drawRoom(nextRoom);
+    glPopMatrix();
 
     glutSwapBuffers();
 }
@@ -355,7 +367,25 @@ void animation() {
     //     camPitch = actualScene->camPitch;
     //     camYaw = actualScene->camYaw;
     // }
-
+    if (nextRoom) {
+        if (upElevation > 10.0f) {
+            actualRoom = nextRoom;
+            nextRoom = NULL;
+            upElevation = 0.0f;
+        } 
+        else {
+            upElevation = upElevation + 0.1f;
+            printf("elevating: %f\n", upElevation);
+        }
+    }
+    if (mainWindow > 0) {
+        glutSetWindow(mainWindow);
+        glutPostRedisplay();
+    }
+    if (secondaryWindow > 0) {
+        glutSetWindow(secondaryWindow);
+        glutPostRedisplay();
+    }
     glutPostRedisplay();
 }
 
@@ -388,7 +418,10 @@ void keyboard(unsigned char key, int x, int y) {
     if (isdigit(key) && isAsking) {
         int roomID = key - '0';
         ROOM *newRoom = getRoom(roomID, actualRoom);
-        if (newRoom) actualRoom = newRoom;
+        if (newRoom) {
+            screenChanging = glutGet(GLUT_ELAPSED_TIME);
+            nextRoom = newRoom;
+        }
 
         else {
             printf("Room %d not found (404)\n", roomID);
