@@ -1,5 +1,5 @@
 // Ejecucion:
-// gcc animation.c ScenarioObjects/world.c ScenarioObjects/scenario.c DrawUtils/utils.c DrawUtils/Materials/materials.c DrawUtils/Textures/textures.c -o exec -lGL -lGLU -lglut -lm; ./exec
+// gcc animation.c ScenarioObjects/worldImplementationp.c ScenarioObjects/worldSetup.c ScenarioObjects/scenario.c DrawUtils/utils.c DrawUtils/Materials/materials.c DrawUtils/Textures/textures.c -o exec -lGL -lGLU -lglut -lm; ./exec
 
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -59,6 +59,9 @@ int main(int argc, char **argv) {
     setupTextures();
     setupSceneLighting();
     scInitLists();
+
+    // map setup
+    setupMapTest();
     setupMapFactory();  
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
@@ -207,6 +210,23 @@ void drawMap(MAP *map) {
             glPushMatrix();
                 glTranslatef(tiles[i]->position[0], 0.0, tiles[i]->position[1]);
                 scDrawMapTile(&matWhiteWall, whitePlanksTexture);
+
+                // element drawing
+                ELEMENT *current = tiles[i]->head;
+                
+                float height = 0.0;
+                while (current != NULL) {
+                    glPushMatrix();
+                        glTranslatef(0.0, height, 0.0);
+                        glRotatef(current->angle, 0.0, 1.0, 0.0);
+
+                        if (current->drawId > 0) { // consider phantom element
+                            glCallList(current->drawId);
+                        }
+                    glPopMatrix();
+                    height += 0.25;
+                    current = current->next;
+                }
             glPopMatrix();
         }
     }
@@ -224,7 +244,7 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
     
-    drawMap(factory);
+    drawMap(test);
 
     glutSwapBuffers();
 }

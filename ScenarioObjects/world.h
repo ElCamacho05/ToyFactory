@@ -10,8 +10,9 @@ typedef struct Element { // list of elements
 typedef struct Tile { // for the tile array
     float position[2];
     int texture;
-    ELEMENT *elementList;
-}TILE;
+    ELEMENT *head;
+    ELEMENT *tail;
+} TILE;
 
 // ROOM wrapper for graphs
 typedef struct Room ROOM;
@@ -28,12 +29,13 @@ typedef struct Room { // a graph of room
     CONNECTION *sideRooms; // contiguous room
 } ROOM;
 
-typedef struct Mao {
+typedef struct Map {
     ROOM *initialRoom;
 } MAP;
 
 extern ELEMENT *phantom;
 
+extern MAP *test;
 extern MAP *factory;
 
 void setupPhantomElement();
@@ -48,6 +50,7 @@ CONNECTION *createConnection(ROOM *room);
 void linkRooms(ROOM *room1, ROOM *room2);
 void deleteConnections(ROOM *room);
 ROOM *createRoom(int id, int width, int depth);
+void setupMapTest();
 void setupMapFactory();
 
 #endif
