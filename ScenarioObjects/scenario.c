@@ -4,6 +4,7 @@
 #include "../DrawUtils/Materials/materials.h"
 #include "../DrawUtils/Textures/textures.h"
 
+// furniture
 GLuint scMapTile = 0;
 GLuint scConveyorBelt = 0;
 GLuint scLamp = 0;
@@ -13,13 +14,17 @@ GLuint scTable = 0;
 GLuint scChair = 0;
 GLuint scStartM = 0;
 GLuint scFunnel = 0;
+// buildings
 GLuint scWall = 0;
 GLuint scWindow = 0;
 GLuint scDoor = 0;
+// characters
+GLuint scSnowman = 0;
 
 int time = 0;
 
 void scInitLists() {
+    // furniture
     scInitMapTile();
     scInitConveyorBelt();
     scInitLamp();
@@ -28,11 +33,20 @@ void scInitLists() {
     scInitChair();
     scInitFunnel();
     scInitStartM();
-
+    // buildings
     scInitWall();
     scInitWindow();
     scInitDoor();
+    // characters
+    scInitSnowman();
 }
+
+
+/*
+---------
+FURNITURE
+---------
+*/
 
 // MAP TILES
 void scInitMapTile() {
@@ -318,60 +332,48 @@ void scInitFunnel() {
     scFunnel = glGenLists(1);
     glNewList(scFunnel, GL_COMPILE);
 
-        // --- 1. CARCASA DE LATÓN (Brass Casing) ---
-        // Usamos la textura dorada para el cuerpo principal
-        applyMaterial(&matWhiteWall); // Base blanca para que resalte la textura
+        // brass casing
+        applyMaterial(&matWhiteWall);
         glEnable(GL_TEXTURE_2D);
         if (blockyGold) boundTexture(blockyGold);
 
-            // Techo (Top Plate)
+            // Top Plate
             glPushMatrix();
-                glTranslatef(0.0f, 0.95f, 0.0f); // Parte más alta
-                glScalef(1.0f, 0.1f, 1.0f);      // Placa plana que cubre todo el tile
+                glTranslatef(0.0f, 0.95f, 0.0f);
+                glScalef(1.0f, 0.1f, 1.0f);
                 utDrawTexturedCube(1.0f);
             glPopMatrix();
 
-            // Pared Izquierda
+            // left wall
             glPushMatrix();
-                glTranslatef(-0.45f, 0.5f, 0.0f); // Borde izquierdo
-                glScalef(0.1f, 0.8f, 1.0f);       // Pared alta y profunda
-                utDrawTexturedCube(1.0f);
-            glPopMatrix();
-
-            // Pared Derecha
-            glPushMatrix();
-                glTranslatef(0.45f, 0.5f, 0.0f);  // Borde derecho
+                glTranslatef(-0.45f, 0.5f, 0.0f);
                 glScalef(0.1f, 0.8f, 1.0f);
                 utDrawTexturedCube(1.0f);
             glPopMatrix();
 
-            // Marco Frontal Superior (El borde de donde cuelgan las gomas)
+            // right wall
             glPushMatrix();
-                glTranslatef(0.0f, 0.85f, 0.45f); // Frente Arriba
-                glScalef(1.0f, 0.1f, 0.1f);       // Barra transversal
+                glTranslatef(0.45f, 0.5f, 0.0f);
+                glScalef(0.1f, 0.8f, 1.0f);
                 utDrawTexturedCube(1.0f);
             glPopMatrix();
 
-        glDisable(GL_TEXTURE_2D); // Apagamos textura dorada
+            // frontal frame
+            glPushMatrix();
+                glTranslatef(0.0f, 0.85f, 0.45f);
+                glScalef(1.0f, 0.1f, 0.1f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
 
-        // --- 2. CORTINAS DE GOMA (Rubber Flaps) ---
-        // Tiras oscuras que cuelgan en la entrada
-        applyMaterial(&matRubber); // Material negro mate (definido en materials.c)
+        glDisable(GL_TEXTURE_2D);
+
+        // rubber flaps
+        applyMaterial(&matRubber);
         
-        // Dibujamos 3 tiras una al lado de la otra
         for(float x = -0.3f; x <= 0.3f; x += 0.3f) {
             glPushMatrix();
-                // Posición: Colgando del marco frontal (Y=0.85 hacia abajo)
-                // Z=0.45 para estar en la "boca" del túnel
-                glTranslatef(x, 0.55f, 0.45f); 
-                
-                // Dimensión: Tiras verticales (0.28 ancho, 0.5 alto)
+                glTranslatef(x, 0.55f, 0.45f);
                 glScalef(0.28f, 0.5f, 0.05f); 
-                
-                // Detalle: Una ligera rotación aleatoria o fija para que parezca que algo pasó
-                // glRotatef(15.0f, 1.0f, 0.0f, 0.0f); // Descomenta para darles ángulo
-                
-                // Usamos el cubo texturizado (aunque sin textura activa) para aprovechar las normales correctas
                 utDrawTexturedCube(1.0f); 
             glPopMatrix();
         }
@@ -397,14 +399,15 @@ void scInitStartM() {
             glCallList(scFunnel);
             glCallList(scFunnel);
         glPopMatrix();
-    
-        applyMaterial(&matPlasticRed);
-        glBegin(GL_TEXTURE_2D);
-        boundTexture(brickTexture);
-            glScalef(3.0, 2.0, 3.0);
-            utDrawTexturedCube(1.0);
-        glEnd();
 
+        glPushMatrix();
+            applyMaterial(&matPlasticRed);
+            glBegin(GL_TEXTURE_2D);
+            boundTexture(brickTexture);
+                glScalef(3.0, 2.0, 3.0);
+                utDrawTexturedCube(1.0);
+            glEnd();
+        glPopMatrix();
     glEndList();
 }
 
@@ -457,6 +460,13 @@ void scInitRobotConstructorTorso() {
 void scInitRobotExplorerTorso() {
     
 }
+
+
+/*
+---------
+BUILDINGS
+---------
+*/
 
 // WALL
 void scInitWall() {
@@ -573,4 +583,94 @@ void scInitDoor() {
 }
 void scDrawDoor() {
     glCallList(scDoor);
+}
+
+
+/*
+----------
+CHARACTERS
+----------
+*/
+void scInitSnowman() {
+    scSnowman = glGenLists(1);
+    glNewList(scSnowman, GL_COMPILE);
+
+        // body
+        applyMaterial(&matWhiteWall); 
+        
+        // base
+        glPushMatrix();
+            glTranslatef(0.0f, 0.4f, 0.0f);
+            glScalef(0.8f, 0.8f, 0.8f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // chest
+        glPushMatrix();
+            glTranslatef(0.0f, 1.1f, 0.0f); 
+            glScalef(0.6f, 0.6f, 0.6f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // head
+        glPushMatrix();
+            glTranslatef(0.0f, 1.6f, 0.0f);
+            glScalef(0.4f, 0.4f, 0.4f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // nose
+        applyMaterial(&matCarrot);
+        glPushMatrix();
+            glTranslatef(0.0f, 1.6f, 0.2f);
+            glScalef(0.04f, 0.04f, 0.2f);
+            utDrawTexturedCube(1.0f); 
+        glPopMatrix();
+
+
+        applyMaterial(&matRubber);
+        // eyes
+        // left
+        glPushMatrix(); 
+            glTranslatef(-0.1f, 1.65f, 0.21f);
+            glScalef(0.05f, 0.05f, 0.05f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        // right
+        glPushMatrix();
+            glTranslatef(0.1f, 1.65f, 0.21f);
+            glScalef(0.05f, 0.05f, 0.05f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // coal buttons
+        for(float y = 1.0f; y <= 1.25f; y += 0.12f) {
+            glPushMatrix();
+                glTranslatef(0.0f, y, 0.31f);
+                glScalef(0.05f, 0.05f, 0.05f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+        }
+
+        // arms
+        applyMaterial(&matBrickBrown);
+        // left
+        glPushMatrix();
+            glTranslatef(-0.35f, 1.2f, 0.0f);
+            glRotatef(45, 0, 0, 1);
+            glScalef(0.4f, 0.04f, 0.04f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+        // right
+        glPushMatrix();
+            glTranslatef(0.35f, 1.2f, 0.0f);
+            glRotatef(-45, 0, 0, 1);
+            glScalef(0.4f, 0.04f, 0.04f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+}
+
+void scDrawSnowman() {
+    glCallList(scSnowman);
 }

@@ -6,6 +6,7 @@
 #include "../DrawUtils/Textures/textures.h"
 
 void scInitLists();
+    // furniture
     void scInitMapTile();
     void scInitConveyorBelt();
     void scInitLamp();
@@ -18,14 +19,16 @@ void scInitLists();
     void scInitToyCar();
     void scInitRobotConstructorTorso();
     void scInitRobotExplorerTorso();
-
+    // buildings
     void scInitWall();
     void scInitWindow();
     void scInitDoor();
+    // characters
+    void scInitSnowman();
 /*
 DRAWING
 */
-// Functions
+// furniture
 void scDrawMapTile(MATERIAL *mat, TEXTURE *texture);
 void scDrawConveyorBelt();
 void scDrawLamp();
@@ -34,12 +37,15 @@ void scDrawTable();
 void scDrawChair();
 void scDrawFunnel();
 void scDrawStartM();
+// buildings
 void scDrawWall();
 void scDrawWindow();
 void scDrawDoor();
+// characters
+void scDrawSnowman();
 
 
-// IDs
+// furniture
 extern GLuint scMapTile;
 extern GLuint scConveyorBelt;
 extern GLuint scLamp;
@@ -49,9 +55,13 @@ extern GLuint scTable;
 extern GLuint scChair;
 extern GLuint scStartM;
 extern GLuint scFunnel;
+// buildings
 extern GLuint scWall;
 extern GLuint scWindow;
 extern GLuint scDoor;
+// characters
+extern GLuint scSnowman;
+
 
 extern int time;
 

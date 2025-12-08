@@ -1,11 +1,19 @@
 
 #include "world.h"
 # include <stdlib.h>
+#include <stdio.h>
 
 ELEMENT *phantom = NULL;
+MAP *factory = NULL;
 
+// ROOM *MFcore;
+// ROOM *MFhead;
+// ROOM *MFarms;
+// ROOM *MFlegs;
+// ROOM *MFback;
+// ROOM *MFtool;
 
-void *setupPhantomElement() {
+void setupPhantomElement() {
     if (phantom) return;
 
     phantom = (ELEMENT*) malloc(sizeof(ELEMENT));
@@ -15,7 +23,7 @@ void *setupPhantomElement() {
 }
 
 // Creates a Tile (1x1 space) for the map
-TILE *createTile(double position[]) {
+TILE *createTile(float position[]) {
     TILE *tile = (TILE*) malloc(sizeof(TILE));
 
     tile->position[0] = position[0];
@@ -72,28 +80,41 @@ void deleteElementsInTile(TILE **tile) {
 }
 
 // create a WxD array of Tiles
-TILE *createTileMap(int width, int depth) {
-    int size = (width+1)*(depth+1);
-    TILE *tiles = (TILE *) malloc(sizeof(TILE)*size);
-    TILE *temp;
+TILE **createTileMap(int width, int depth) {
+    int size = (2*width+1)*(2*depth+1); // last one is NULL
+    TILE **tiles = (TILE **) malloc(sizeof(TILE *)*size);
+    int idx = 0;
+    float position[2];
 
     // initialize positions
-    for (int i = -width; i < width; i++) {
-        for (int j = -depth; j < width; j++) {
-            temp->elementList = NULL;
-            temp->position[0] = i;
-            temp->position[1] = j;
-            temp++; // change to item in array
+    for (int i = -width; i <= width; i++) {
+        for (int j = -depth; j <= depth; j++) {
+            position[0] = i;
+            position[1] = j;
+            tiles[idx] = createTile(position);
+            tiles[idx]->texture = -1;
+            tiles[idx]->elementList = NULL;
+            printf("agregando en %f %f \n", position[0], position[1]);
+            tiles[idx]->position[0] = i;
+            tiles[idx]->position[1] = j;
+            idx++;
         }
     }
+
 
     return tiles;
 }
 
 // deletes the whole tile, by deleting the elements into it,
 // and then deleting the tile itself (SELF DESTRUCTION IN 3 2 1...)
-void deleteMapTile(TILE *tileArray) {
-    free(tileArray);
+void freeTileMap(TILE **tiles, int width, int depth) {
+    int size = (2 * width + 1) * (2 * depth + 1);
+    
+    for (int i = 0; i < size; i++) {
+        free(tiles[i]); 
+    }
+    
+    free(tiles);
 }
 
 CONNECTION *createConnection(ROOM *room) {
@@ -108,13 +129,13 @@ void linkRooms(ROOM *room1, ROOM *room2) {
     // one direction (XD)
     CONNECTION *newConn1 = createConnection(room2);
     if (!newConn1) return; 
-    newConn1->contRoom = room1->sideRooms;
+    newConn1->contRoom = room1;
     room1->sideRooms = newConn1;
 
     // other direction
     CONNECTION *newConn2 = createConnection(room1);
     if (!newConn2) return;
-    newConn2->contRoom = room2->sideRooms;
+    newConn2->contRoom = room2;
     room2->sideRooms = newConn2;
 }
 
@@ -133,6 +154,8 @@ ROOM *createRoom(int id, int width, int depth) {
 
     if (!newRoom) return NULL;
     newRoom->id = id;
+    newRoom->width = width;
+    newRoom->depth = depth;
     newRoom->tileArray = createTileMap(width, depth);
     newRoom->sideRooms = NULL;
 
@@ -140,7 +163,8 @@ ROOM *createRoom(int id, int width, int depth) {
 }
 
 void setupMapFactory() {
-
+    factory = (MAP *) malloc(sizeof(MAP));
+    factory->initialRoom = createRoom(0, 3, 1);
 }
 
 void mapFactory() {

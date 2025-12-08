@@ -1,5 +1,5 @@
 // Ejecucion:
-// gcc animation.c ScenarioObjects/scenario.c DrawUtils/utils.c DrawUtils/Materials/materials.c DrawUtils/Textures/textures.c -o exec -lGL -lGLU -lglut -lm; ./exec
+// gcc animation.c ScenarioObjects/world.c ScenarioObjects/scenario.c DrawUtils/utils.c DrawUtils/Materials/materials.c DrawUtils/Textures/textures.c -o exec -lGL -lGLU -lglut -lm; ./exec
 
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -7,9 +7,11 @@
 #include <stdio.h>
 
 #include "ScenarioObjects/scenario.h"
+#include "ScenarioObjects/world.h"
 #include "DrawUtils/utils.h"
 #include "DrawUtils/Materials/materials.h"
 #include "DrawUtils/Textures/textures.h"
+
 
 #define X 0
 #define Y 1
@@ -42,7 +44,7 @@ void animation();
 void initGL();
 void setupSceneLighting();
 void drawTestSceneObjects();
-void drawTileElements();
+void drawMap(MAP *map);
 void setupTextures();
 void keyboard(unsigned char key, int x, int y);
 void reshape(int w, int h);
@@ -56,7 +58,8 @@ int main(int argc, char **argv) {
     initGL();
     setupTextures();
     setupSceneLighting();
-    scInitLists();         
+    scInitLists();
+    setupMapFactory();  
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
 
@@ -177,12 +180,36 @@ void drawTestSceneObjects() {
         glRotatef(90.0, 0.0, 1.0, 0.0);
         scDrawFunnel();
     glPopMatrix();
+
     scDrawStartM();
     scDrawConveyorBelt();
+
+    glPushMatrix();
+        glTranslatef(3.0, 0.0, -1.0);
+        scDrawSnowman();
+    glPopMatrix();
+
 }
 
-void drawTileElements() {
+void drawMap(MAP *map) {
+    if (!map || !map->initialRoom) return;
 
+    ROOM *actualRoom = map->initialRoom;
+    
+    TILE **tiles = (actualRoom->tileArray); 
+    
+    int mapWidth = actualRoom->width * 2 + 1;
+    int mapDepth = actualRoom->depth * 2 + 1;
+    int totalTiles = mapWidth * mapDepth;
+
+    for (int i = 0; i < totalTiles; i++) {
+        if (tiles[i] != NULL) { 
+            glPushMatrix();
+                glTranslatef(tiles[i]->position[0], 0.0, tiles[i]->position[1]);
+                scDrawMapTile(&matWhiteWall, whitePlanksTexture);
+            glPopMatrix();
+        }
+    }
 }
 
 void display() {
@@ -196,8 +223,8 @@ void display() {
               0.0, 1.0, 0.0);
 
     glMatrixMode(GL_MODELVIEW);
-
-    drawTestSceneObjects();
+    
+    drawMap(factory);
 
     glutSwapBuffers();
 }

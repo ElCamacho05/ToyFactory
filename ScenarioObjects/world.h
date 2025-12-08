@@ -4,11 +4,12 @@
 typedef struct Element { // list of elements
     int drawId;
     double angle;
-    struct element *next;
+    struct Element *next;
 } ELEMENT;
 
 typedef struct Tile { // for the tile array
-    int position[2];
+    float position[2];
+    int texture;
     ELEMENT *elementList;
 }TILE;
 
@@ -21,17 +22,32 @@ typedef struct connection {
 
 typedef struct Room { // a graph of room
     int id;
-    TILE *tileArray;
+    TILE **tileArray;
+    int width;
+    int depth;
     CONNECTION *sideRooms; // contiguous room
 } ROOM;
 
+typedef struct Mao {
+    ROOM *initialRoom;
+} MAP;
+
 extern ELEMENT *phantom;
 
-extern ROOM *MFcore;
-extern ROOM *MFhead;
-extern ROOM *MFarms;
-extern ROOM *MFlegs;
-extern ROOM *MFback;
-extern ROOM *MFtool;
+extern MAP *factory;
+
+void setupPhantomElement();
+TILE *createTile(float position[]);
+ELEMENT *createElement(int idElem, double angle);
+void insertElement(TILE **tile, ELEMENT *elem);
+ELEMENT *popElement(TILE **tile);
+void deleteElementsInTile(TILE **tile);
+TILE **createTileMap(int width, int depth);
+void freeTileMap(TILE **tiles, int width, int depth);
+CONNECTION *createConnection(ROOM *room);
+void linkRooms(ROOM *room1, ROOM *room2);
+void deleteConnections(ROOM *room);
+ROOM *createRoom(int id, int width, int depth);
+void setupMapFactory();
 
 #endif

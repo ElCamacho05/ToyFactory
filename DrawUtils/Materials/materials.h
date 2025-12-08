@@ -38,6 +38,7 @@ extern MATERIAL matWater;           // Agua azulada brillante (Río)
 extern MATERIAL matAsphalt;         // Asfalto gris oscuro (Carretera)
 extern MATERIAL matGrass;           // Hierba verde (Suelo)
 extern MATERIAL matConcrete;        // Concreto gris claro (Puente, Búnkers)
+extern MATERIAL matCarrot;
 
 // Special materials
 extern MATERIAL matGlass;           // glass-like (low diffuse, high specular)
