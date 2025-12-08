@@ -85,9 +85,18 @@ int main(int argc, char **argv) {
     setupMapTest();
     setupMapFactory();  
 
-    actualMap = factory;
+    /*
+    SELECT WHICH MAP TO USE
+    */
+    // FOR TESTING
+    // actualMap = test;
+    // actualRoom = test->initialRoom;
+    // firstRoom = test->initialRoom;
 
-    actualRoom = factory->initialRoom;
+    // FOR MAIN ANIMATION
+    actualMap = factory;
+    actualRoom = actualMap->initialRoom;
+    firstRoom = actualMap->initialRoom;
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
 
@@ -284,13 +293,13 @@ void drawTreeRecursive(ROOM *room, float x, float z, float xGap, float zGap) {
 void drawMultipleRooms(ROOM *rootRoom, float xSpace, float zSpace) {
     if (!rootRoom) return;
 
-    if (factory && factory->initialRoom) {
-        resetGraphFlags(factory->initialRoom);
+    if (actualMap && actualMap->initialRoom) {
+        resetGraphFlags(actualMap->initialRoom);
     } else {
         resetGraphFlags(rootRoom); 
     }
 
-    ROOM *startNode = (factory && factory->initialRoom) ? factory->initialRoom : rootRoom;
+    ROOM *startNode = (actualMap && actualMap->initialRoom) ? actualMap->initialRoom : rootRoom;
     
     drawTreeRecursive(startNode, 0.0f, 0.0f, xSpace, zSpace);
 }
