@@ -5,6 +5,55 @@
 #include "../DrawUtils/Materials/materials.h"
 #include "../DrawUtils/Textures/textures.h"
 
+typedef struct RobotCore R_CORE;
+    typedef struct RobotHead R_HEAD;
+        typedef struct RobotAcc R_F_ACC;
+    typedef struct RobotArms R_ARMS;
+        typedef struct RobotHands R_HANDS;
+            typedef struct RobotTool R_TOOL;
+    typedef struct RobotLegs R_LEGS;
+        typedef struct RobotBoots R_BOOTS;
+    typedef struct RobotBack R_BACK;
+
+typedef struct RobotCore {
+    int drawID;
+    R_HEAD *head;
+    R_ARMS *arms;
+    R_LEGS *legs;
+    R_BACK *back;
+} R_CORE;
+
+    typedef struct RobotHead {
+        int drawID;
+        R_F_ACC *f_acc;
+    } R_HEAD;
+
+        typedef struct RobotAcc {
+            int drawID;
+        } R_F_ACC;
+
+    typedef struct RobotArms {
+        int drawID;
+        R_HANDS *hand;
+    } R_ARMS;
+
+        typedef struct RobotTool {
+            int drawID;
+        } R_TOOL;
+
+    typedef struct RobotLegs {
+        int drawID;
+        R_BOOTS *boots;
+    } R_LEGS;
+
+        typedef struct RobotBoots {
+            int drawID;
+        } R_BOOTS;
+
+    typedef struct RobotBack {
+        int drawID;
+    } R_BACK;
+
 void scInitLists();
     // furniture
     void scInitMapTile();

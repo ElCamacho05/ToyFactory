@@ -145,6 +145,7 @@ CONNECTION *createConnection(ROOM *room) {
     return conn;
 }
 
+// link bidirectionally two rooms 
 void linkRooms(ROOM *room1, ROOM *room2) {
     // one direction (XD)
     CONNECTION *newConn1 = createConnection(room2);
@@ -159,6 +160,7 @@ void linkRooms(ROOM *room1, ROOM *room2) {
     room2->sideRooms = newConn2;
 }
 
+// deletes the connection nodes for a room
 void deleteConnections(ROOM *room) {
     CONNECTION *temp = room->sideRooms;
     CONNECTION *delete;
@@ -198,6 +200,23 @@ ROOM *getRoom(int id, ROOM *room) {
 
     printf("Not found\n");
     return NULL;
+}
+
+// create a pile node containing the direction of a room
+ROOM_P_N *createRoomPileNode(ROOM *room) {
+    ROOM_P_N *rpn = (ROOM_P_N *) malloc(sizeof(ROOM_P_N));
+    if (!rpn) return NULL;
+    rpn->room = room;
+    rpn->next = NULL;
+    return rpn;
+}
+
+// inserts a pile node into the room pile
+void insertRoomIntoPile(ROOM_P **rp, ROOM_P_N *rpn) {
+    if (!(*rp) || !rpn) return;
+    rpn->next = (*rp)->head;
+    (*rp)->head = rpn;
+    (*rp)->size++;
 }
 
 // Obtains the width (sum) of all of the adjacent nodes
