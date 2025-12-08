@@ -45,7 +45,7 @@ long beforeSceneTime = 0.0;
 
 MAP *actualMap;;
 ROOM *actualRoom;
-int isAsking = 0;
+int isAsking = 1;
 
 void displayMain();
 void displaySecondary();
@@ -386,11 +386,12 @@ void keyboard(unsigned char key, int x, int y) {
 
     // Initial room. Main Menu
     if (isdigit(key) && isAsking) {
-        ROOM *newRoom = getRoom(1, actualRoom);
+        int roomID = key - '0';
+        ROOM *newRoom = getRoom(roomID, actualRoom);
         if (newRoom) actualRoom = newRoom;
 
         else {
-            printf("Room %s not found (404)\n", key);
+            printf("Room %d not found (404)\n", roomID);
         }
     }
 

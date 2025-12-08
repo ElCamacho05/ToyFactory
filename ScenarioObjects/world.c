@@ -197,6 +197,7 @@ ROOM *getRoom(int id, ROOM *room) {
     }
 
     printf("Not found\n");
+    return NULL;
 }
 
 // Obtains the width (sum) of all of the adjacent nodes
