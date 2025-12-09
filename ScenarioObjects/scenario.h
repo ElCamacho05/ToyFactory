@@ -19,6 +19,7 @@ typedef struct RobotCore R_CORE;
 typedef struct RobotTask {
     float x;
     float z;
+    int delay; // time to sleep after task finished (in milliseconds)
     struct RobotTask *next;
 } R_TASK;
 
@@ -70,7 +71,7 @@ typedef struct RobotCore {
     } R_BACK;
 
 R_CORE *scCreateRobotInstance();
-void scAddRobotTask(R_CORE *robot, float targetX, float targetZ);
+void scAddRobotTask(R_CORE *robot, float targetX, float targetZ, int delay);
 R_TASK *scPopRobotTask(R_CORE *robot);
 
 void scInitLists();

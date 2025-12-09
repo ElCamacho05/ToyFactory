@@ -563,8 +563,10 @@ void scInitRoboticArm() {
         applyMaterial(&matPlasticRed);
         glPushMatrix();
             glTranslatef(0.0f, 0.1f, 0.0f);
-            glScalef(0.8f, 0.2f, 0.8f);
-            utDrawTexturedCube(1.0f);
+            glRotatef(90.0, 1.0, 0.0, 0.0);
+            // glScalef(0.8f, 0.2f, 0.8f);
+            utDrawCylinder(0.5, 0.2, 20, &matPlasticRed);
+            // utDrawTexturedCube(1.0f);
         glPopMatrix();
 
         // Rot axis
@@ -1400,14 +1402,15 @@ R_CORE *scCreateRobotInstance() {
     return robot;
 }
 
-void scAddRobotTask(R_CORE *robot, float targetX, float targetZ) {
+void scAddRobotTask(R_CORE *robot, float targetX, float targetZ, int delay) {
     if (!robot) return;
 
     R_TASK *newTask = (R_TASK*) malloc(sizeof(R_TASK));
     newTask->x = targetX;
     newTask->z = targetZ;
+    newTask->delay = delay;
     
-    // En una pila, el nuevo es el primero (head)
+    // printf("Added task: %.2f, %.2f\n", targetX, targetZ);
     newTask->next = robot->taskStack;
     robot->taskStack = newTask;
 }

@@ -82,6 +82,7 @@ int type = -1;
 
 int screenChanging = 0;;
 float upElevation = 0.0;
+int nextTimeTaskUpdate = -1;
 
 void displayMain();
 void displaySecondary();
@@ -257,16 +258,34 @@ void drawRoom(ROOM *room) {
                 float height = 0.0;
                 while (current != NULL) {
                     glPushMatrix();
-                        if (current->drawId == &scRobot) 
-                            if (rCore) scDrawRobotDirect(rCore);                             
-                        
                         glTranslatef(0.0, height, 0.0);
                         glRotatef(current->angle, 0.0, 1.0, 0.0);
 
-                        if (current->drawId > 0) {
+                        if (current->drawId == &scRoboticArm) {
+                            int time = glutGet(GLUT_ELAPSED_TIME);
+                            int spinDuration = 2000;
+                            int pauseDuration = 500;
+                            int cycleDuration = spinDuration + pauseDuration;
+                            
+                            float armAngle = 0.0f;
+                            int fullCycles = time / cycleDuration;
+                            int timeInCycle = time % cycleDuration;
+                            
+                            armAngle = fullCycles * 180.0f;
+                            if (timeInCycle < spinDuration) {
+                                armAngle += ((float)timeInCycle / spinDuration) * 180.0f;
+                            } else {
+                                armAngle += 180.0f;
+                            }
+                            glRotatef(armAngle, 0.0f, 1.0f, 0.0f); 
                             glCallList(*(current->drawId));
                         }
-                        // glCallList(scRobot);
+                        else if (current->drawId == &scRobot) {
+                            if (rCore) scDrawRobotDirect(rCore); 
+                        }
+                        else if (current->drawId != NULL && *(current->drawId) > 0) {
+                            glCallList(*(current->drawId));
+                        }
                     glPopMatrix();
                     height += 1.0;
                     current = current->next;
@@ -407,7 +426,7 @@ void displayMain() {
     glPopMatrix();
 
     glPushMatrix();
-        glTranslatef(0.0, upElevation-10.0f, 0.0);
+        glTranslatef(0.0, upElevation-15.0f, 0.0);
         drawRoom(nextRoom);
     glPopMatrix();
 
@@ -419,7 +438,7 @@ void displayMain() {
         switch (phase)
         {
         case START:
-            setDialog("[ SYSTEM ]: ", "Ready for building your Robot? {press any key to continue}...");
+            setDialog("[ SYSTEM ]: ", "Ready for building your Robot? {press ENTER key to continue}...");
             phase = READY;
             isDialogPassive = 1;
             nextRoom = getRoom(1, actualRoom);
@@ -516,31 +535,48 @@ void animation() {
         rCore->isMoving = 1;
 
         R_TASK *target = rCore->taskStack;
-
+        printf("excecuting task %2.f %.2f\n", target->x, target->z);
         float dx = target->x - rCore->currentX;
         float dz = target->z - rCore->currentZ;
         float distance = sqrt(dx*dx + dz*dz);
-        float moveSpeed = 0.01f;
+        float moveSpeed = 0.1f;
 
         if (distance <= moveSpeed) {
             rCore->currentX = target->x;
             rCore->currentZ = target->z;
 
-            R_TASK *doneTask = scPopRobotTask(rCore);
-            free(doneTask);
-            
-            if (!rCore->taskStack) rCore->isMoving = 0;
+            if (nextTimeTaskUpdate == -1) {
+                nextTimeTaskUpdate = glutGet(GLUT_ELAPSED_TIME) + target->delay;
+            }
+
+            if (now >= nextTimeTaskUpdate) {
+                R_TASK *doneTask = scPopRobotTask(rCore);
+                free(doneTask);
+                // if (!rCore->taskStack) rCore->isMoving = 0;
+                nextTimeTaskUpdate = -1;
+            }
         } 
         else {
             rCore->currentX += (dx / distance) * moveSpeed;
             rCore->currentZ += (dz / distance) * moveSpeed;
         }
     }
+    
+    else if (rCore && rCore->isMoving) {
+        if (nextTimeTaskUpdate == -1) {
+            nextTimeTaskUpdate = now + 2000;
+        }
+        if (now >= nextTimeTaskUpdate) {
+            rCore->isMoving = 0;
+            nextTimeTaskUpdate = -1;
+        }
+    }
 
-    int robotStopped = (rCore == NULL) || (rCore->isMoving == 0);
+    // int robotStopped = ((rCore == NULL) || (rCore->isMoving == 0)) && (!rCore->taskStack);
+    int robotStopped = ((rCore == NULL) || (rCore->isMoving == 0) || (!rCore->taskStack));
     
     if (nextRoom && robotStopped) {
-        if (upElevation > 10.0f) {
+        if (upElevation > 15.0f) {
             actualRoom = nextRoom;
             nextRoom = NULL;
             upElevation = 0.0f;
@@ -620,9 +656,6 @@ void keyboard(unsigned char key, int x, int y) {
         if (phase == START) {
             rCore = addToRobot(-1, rCore, scRobotTorsoThin);
             nextRoom = getRoom (1, actualRoom);
-            for (int x = nextRoom->width; x >= nextRoom->width; x--) {
-                scAddRobotTask(rCore, x, 0.0f);
-            }
         }
         if (phase == READY){
             if (key == '1') {
@@ -640,9 +673,40 @@ void keyboard(unsigned char key, int x, int y) {
             else return;
             nextRoom = getRoom (2, actualRoom);
 
-            for (int x = nextRoom->width; x >= nextRoom->width; x--) {
-                scAddRobotTask(rCore, x, 0.0f);
+            for (int x = nextRoom->width; x > -(nextRoom->width)+5; x--) {
+                if (x == 0 || x == 3) scAddRobotTask(rCore, x, 0.0f, 4000);
+                else scAddRobotTask(rCore, x, 0.0f, 0);
             }
+            rCore->currentX = -(nextRoom->width)+3;
+            rCore->currentZ = 0.0f;
+        }
+        if (phase == CORE){
+            // if (key == '1') {
+            //     type = ADVENTURER;
+            //     setDialog("[ SYSTEM ]: ", "You have selected Adventurer...");
+            //     rCore = addToRobot(0, rCore, scRobotTorsoThin);
+            //     isAsking = 0;
+            // }
+            // else if (key == '2') {
+            //     setDialog("[ SYSTEM ]: ", "You have selected Builder...");
+            //     rCore = addToRobot(0, rCore, scRobotTorsoThick);
+            //     type = BUILDER;
+            //     isAsking = 0;
+            // }
+            // else return;
+           
+            setDialog("[ SYSTEM ]: ", "You are not ");
+
+            rCore = addToRobot(1, rCore, scRobotHeadNormal);
+            isAsking = 0;
+            nextRoom = getRoom (3, actualRoom);
+
+            for (int z = nextRoom->depth; z > -(nextRoom->depth)+5; z--) {
+                if (z == 0 || z == 3) scAddRobotTask(rCore, z, 0.0f, 4000);
+                else scAddRobotTask(rCore, 0.0f, 0.0f, z);
+            }
+            rCore->currentX = 0.0f;
+            rCore->currentZ = -(nextRoom->depth)+3;
         }
     }
 
