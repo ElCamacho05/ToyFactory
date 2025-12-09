@@ -322,7 +322,6 @@ void setupIntermediateRooms(ROOM *room) {
     place(room, &scRoboticArm, 180.0, 1, 1); 
     place(room, &scRoboticArm, 0.0, -2, -1);
 
-    // place(room, &scStartM, 0.0, -w+1, 0);
 
     place(room, &scChristmasTree, 0.0, -3, -3);
     place(room, &scChristmasTree, 45.0, 3, 3);
@@ -404,6 +403,7 @@ void setupMapFactory() {
     firstRoom = factory->initialRoom;
     // our hero!!!
     place(factory->initialRoom, &scTestRobot, 90.0, 2.0, 2.0);
+
     // Snowman
     place(factory->initialRoom, &scSnowman, 0.0, 3, -1);
     // Start Machine
@@ -434,26 +434,46 @@ void setupMapFactory() {
         place(factory->initialRoom, &scWall, 90.0, -4, z);
     }
 
-    /*
-    2: (TORSO) SECOND MAP
-    */
+    // CORE (ID 1)
     ROOM *Room1 = createRoom(1, 6, 6);
     linkRooms(factory->initialRoom, Room1);
     setupCoreRoom(Room1);
+    setupCoreRoom(Room1);
     place(Room1, &scRobot, 0.0, -2.0, 0.0);
 
-    /*
-    HEAD
-    */
+
+    // HEAD (ID 2)
     ROOM *Room2 = createRoom(2, 6, 6);
     linkRooms(Room1, Room2);
     setupIntermediateRooms(Room2);
+    place(Room2, &scRobot, 0.0, -2.0, 0.0);
 
-    /*
-    HEAD
-    */
+
+    // ARMS (ID 3)
     ROOM *Room3 = createRoom(3, 6, 6);
     linkRooms(Room2, Room3);
     setupIntermediateRooms(Room3);
+    place(Room3, &scRobot, 0.0, -2.0, 0.0);
+
+
+    // LEGS (ID 4)
+    ROOM *Room4 = createRoom(4, 6, 6);
+    linkRooms(Room3, Room4);
+    setupIntermediateRooms(Room4);
+    place(Room4, &scRobot, 0.0, -2.0, 0.0);
+
+
+    // BOOTS (ID 5)
+    ROOM *Room5 = createRoom(5, 6, 6);
+    linkRooms(Room4, Room5);
+    setupIntermediateRooms(Room5);
+    place(Room5, &scRobot, 0.0, -2.0, 0.0);
+
+    
+    // FIN (ID 6)
+    ROOM *Room6 = createRoom(6, 6, 6);
+    linkRooms(Room5, Room6);
+    setupIntermediateRooms(Room6);
+    place(Room5, &scRobot, 0.0, -2.0, 0.0);
 }
 

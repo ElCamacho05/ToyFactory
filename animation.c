@@ -54,7 +54,7 @@ int dialogActive = 1;
 
 char character[30];
 char dialog[100];
-int isAsking = 0;
+int isAsking = 1;
 int iRtF = 0;
 char roomToFind[20];
 
@@ -257,6 +257,13 @@ void drawRoom(ROOM *room) {
                 
                 float height = 0.0;
                 while (current != NULL) {
+                    if (current->drawId == &scRobot) {
+                        if (rCore) {
+                            scDrawRobotDirect(rCore); 
+                            current = current->next;
+                            continue;
+                        }
+                    }
                     glPushMatrix();
                         glTranslatef(0.0, height, 0.0);
                         glRotatef(current->angle, 0.0, 1.0, 0.0);
@@ -280,9 +287,7 @@ void drawRoom(ROOM *room) {
                             glRotatef(armAngle, 0.0f, 1.0f, 0.0f); 
                             glCallList(*(current->drawId));
                         }
-                        else if (current->drawId == &scRobot) {
-                            if (rCore) scDrawRobotDirect(rCore); 
-                        }
+                        
                         else if (current->drawId != NULL && *(current->drawId) > 0) {
                             glCallList(*(current->drawId));
                         }
@@ -388,6 +393,31 @@ void setDialog(char *chrctr, char *dlg) {
     strcpy(dialog, dlg);
 }
 
+void generatePathForCurrentRoom(ROOM *room) {
+    if (!rCore || !room) return;
+
+    // Limpiar tareas viejas por seguridad
+    while(rCore->taskStack) { 
+        R_TASK *t = scPopRobotTask(rCore); free(t); 
+    }
+    
+    // Posicionamos al robot visualmente al inicio de la cinta (Lado Izquierdo o Fondo)
+    // Para simplificar, usaremos flujo en X (Izquierda a Derecha) para todo
+    rCore->currentX = -(float)room->width - 1.0f;
+    rCore->currentZ = 0.0f;
+
+    // PILA DE TAREAS (Orden Inverso: Meta -> Inicio)
+    
+    // 3. Salir de la sala (hacia la derecha)
+    scAddRobotTask(rCore, (float)room->width + 2.0f, 0.0f, 0);
+
+    // 2. Pausa en el centro (Construcción)
+    scAddRobotTask(rCore, 0.0f, 0.0f, 1500); // 1.5 segundos de pausa
+
+    // 1. Entrar al centro
+    scAddRobotTask(rCore, 0.0f, 0.0f, 0);
+}
+
 // FOR THE MAIN WINDOW
 void displayMain() {
     glClearColor(0.678, 0.847, 0.902, 1.0); 
@@ -397,31 +427,17 @@ void displayMain() {
     int h = glutGet(GLUT_WINDOW_HEIGHT);
     if (h == 0) h = 1;
     float aR = (float)w / (float)h;
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    if (w >= h) {
-        glOrtho(-viewWidthMain * aR, viewWidthMain * aR, 
-                -viewWidthMain, viewWidthMain, 
-                -100.0, 1000.0);
-    } else {
-        glOrtho(-viewWidthMain, viewWidthMain, 
-                -viewWidthMain / aR, viewWidthMain / aR, 
-                -100.0, 1000.0);
-    }
-
+    if (w >= h) glOrtho(-viewWidthMain * aR, viewWidthMain * aR, -viewWidthMain, viewWidthMain, -100.0, 1000.0);
+    else glOrtho(-viewWidthMain, viewWidthMain, -viewWidthMain / aR, viewWidthMain / aR, -100.0, 1000.0);
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    gluLookAt(camPosition[X], camPosition[Y], camPosition[Z], camPointTo[X], camPointTo[Y], camPointTo[Z], 0.0, 1.0, 0.0);
 
-    gluLookAt(camPosition[X], camPosition[Y], camPosition[Z],
-              camPointTo[X], camPointTo[Y], camPointTo[Z],
-              0.0, 1.0, 0.0);
-
-    
     glPushMatrix();
         glTranslatef(0.0, upElevation, 0.0);
-        // drawMap(test);
         drawRoom(actualRoom);
     glPopMatrix();
 
@@ -432,30 +448,6 @@ void displayMain() {
 
     if (dialogActive) drawDialogueBox(character, dialog);
 
-    if (dialogPassed) {
-        dialogPassed = 0;
-        isDialogPassive = 0;
-        switch (phase)
-        {
-        case START:
-            setDialog("[ SYSTEM ]: ", "Ready for building your Robot? {press ENTER key to continue}...");
-            phase = READY;
-            isDialogPassive = 1;
-            nextRoom = getRoom(1, actualRoom);
-            break;
-        case READY:
-            setDialog("[ SYSTEM ]: ", "Which type of robot do you wan't to build? 1) adventurer 2) builder");
-            isAsking = 1;
-            
-            break;
-        case CORE:
-
-            break;
-        default:
-            break;
-        }
-
-    }
     glutSwapBuffers();
 }
 
@@ -530,70 +522,92 @@ void animation() {
     long now = glutGet(GLUT_ELAPSED_TIME);
     sceneTime = now - beforeSceneTime;
 
-    // control the robot movement by the current task 
     if (rCore && rCore->taskStack) {
         rCore->isMoving = 1;
-
         R_TASK *target = rCore->taskStack;
-        printf("excecuting task %2.f %.2f\n", target->x, target->z);
         float dx = target->x - rCore->currentX;
         float dz = target->z - rCore->currentZ;
         float distance = sqrt(dx*dx + dz*dz);
-        float moveSpeed = 0.1f;
+        float moveSpeed = 0.08f; // speed
 
         if (distance <= moveSpeed) {
             rCore->currentX = target->x;
             rCore->currentZ = target->z;
-
-            if (nextTimeTaskUpdate == -1) {
-                nextTimeTaskUpdate = glutGet(GLUT_ELAPSED_TIME) + target->delay;
-            }
-
+            if (nextTimeTaskUpdate == -1) nextTimeTaskUpdate = now + target->delay;
             if (now >= nextTimeTaskUpdate) {
-                R_TASK *doneTask = scPopRobotTask(rCore);
-                free(doneTask);
-                // if (!rCore->taskStack) rCore->isMoving = 0;
+                R_TASK *doneTask = scPopRobotTask(rCore); free(doneTask);
                 nextTimeTaskUpdate = -1;
             }
-        } 
-        else {
+        } else {
             rCore->currentX += (dx / distance) * moveSpeed;
             rCore->currentZ += (dz / distance) * moveSpeed;
         }
-    }
-    
-    else if (rCore && rCore->isMoving) {
-        if (nextTimeTaskUpdate == -1) {
-            nextTimeTaskUpdate = now + 2000;
-        }
-        if (now >= nextTimeTaskUpdate) {
-            rCore->isMoving = 0;
-            nextTimeTaskUpdate = -1;
-        }
+    } else if (rCore) {
+        rCore->isMoving = 0;
     }
 
-    // int robotStopped = ((rCore == NULL) || (rCore->isMoving == 0)) && (!rCore->taskStack);
-    int robotStopped = ((rCore == NULL) || (rCore->isMoving == 0) || (!rCore->taskStack));
-    
-    if (nextRoom && robotStopped) {
-        if (upElevation > 15.0f) {
+    if (nextRoom) {
+        if (upElevation < 15.0f) {
+            upElevation += 0.2f;
+        } 
+        else {
             actualRoom = nextRoom;
             nextRoom = NULL;
             upElevation = 0.0f;
-        } 
-        else {
-            upElevation = upElevation + 0.1f;
+
+            if (phase == START) { 
+                phase = CORE;
+                setDialog("[ SYSTEM ]: ", "Building CORE...");
+                rCore = addToRobot(-1, rCore, scRobotTorsoThick);
+                generatePathForCurrentRoom(actualRoom);
+            }
+            else if (phase == CORE) {
+                phase = HEAD;
+                setDialog("[ SYSTEM ]: ", "Installing HEAD...");
+                rCore = addToRobot(1, rCore, scRobotHeadNormal);
+                generatePathForCurrentRoom(actualRoom);
+            }
+            else if (phase == HEAD) {
+                phase = ARMS;
+                setDialog("[ SYSTEM ]: ", "Attaching ARMS...");
+                rCore = addToRobot(3, rCore, scRobotArmThick);
+                generatePathForCurrentRoom(actualRoom);
+            }
+            else if (phase == ARMS) {
+                phase = LEGS;
+                setDialog("[ SYSTEM ]: ", "Welding LEGS...");
+                rCore = addToRobot(5, rCore, scRobotLegArmored);
+                generatePathForCurrentRoom(actualRoom);
+            }
+            else if (phase == LEGS) {
+                phase = BOOTS;
+                setDialog("[ SYSTEM ]: ", "Fitting BOOTS...");
+                rCore = addToRobot(6, rCore, scRobotBootThruster);
+                generatePathForCurrentRoom(actualRoom);
+            }
+            else if (phase == BOOTS) {
+                phase = FREE;
+                setDialog("[ SYSTEM ]: ", "Robot COMPLETE! Ready for shipping.");
+                if(rCore) {
+                     rCore->currentX = 0.0f; rCore->currentZ = 0.0f;
+                }
+            }
+            
+            isAsking = 0; 
         }
     }
-    if (mainWindow > 0) {
-        glutSetWindow(mainWindow);
-        glutPostRedisplay();
+
+    if (rCore && !rCore->isMoving && !rCore->taskStack && !nextRoom && phase != FREE) {
+        if (!isAsking) {
+            char buff[100];
+            sprintf(buff, "Phase %d Complete. Press ENTER to continue...", phase);
+            setDialog("[ SYSTEM ]: ", buff);
+            isAsking = 1; // re enable keyboard
+        }
     }
-    if (secondaryWindow > 0) {
-        glutSetWindow(secondaryWindow);
-        glutPostRedisplay();
-    }
-    glutPostRedisplay();
+
+    if (mainWindow > 0) { glutSetWindow(mainWindow); glutPostRedisplay(); }
+    if (secondaryWindow > 0) { glutSetWindow(secondaryWindow); glutPostRedisplay(); }
 }
 
 R_CORE *addToRobot(int progress, R_CORE *robot, int drawID) {
@@ -650,85 +664,36 @@ R_CORE *addToRobot(int progress, R_CORE *robot, int drawID) {
     return robot;
 }
 
-// SHARED KEYBOARD
 void keyboard(unsigned char key, int x, int y) {
-    if (isAsking) {
-        if (phase == START) {
-            rCore = addToRobot(-1, rCore, scRobotTorsoThin);
-            nextRoom = getRoom (1, actualRoom);
-        }
-        if (phase == READY){
-            if (key == '1') {
-                type = ADVENTURER;
-                setDialog("[ SYSTEM ]: ", "You have selected Adventurer...");
-                rCore = addToRobot(0, rCore, scRobotTorsoThin);
-                isAsking = 0;
-            }
-            else if (key == '2') {
-                setDialog("[ SYSTEM ]: ", "You have selected Builder...");
-                rCore = addToRobot(0, rCore, scRobotTorsoThick);
-                type = BUILDER;
-                isAsking = 0;
-            }
-            else return;
-            nextRoom = getRoom (2, actualRoom);
+    if (key == 13) {
+        if (phase == START && !rCore) {
+            setDialog("[ SYSTEM ]: ", "Starting Factory Tour...");
 
-            for (int x = nextRoom->width; x > -(nextRoom->width)+5; x--) {
-                if (x == 0 || x == 3) scAddRobotTask(rCore, x, 0.0f, 4000);
-                else scAddRobotTask(rCore, x, 0.0f, 0);
-            }
-            rCore->currentX = -(nextRoom->width)+3;
-            rCore->currentZ = 0.0f;
+            nextRoom = getRoom(1, actualRoom);
+            return;
         }
-        if (phase == CORE){
-            // if (key == '1') {
-            //     type = ADVENTURER;
-            //     setDialog("[ SYSTEM ]: ", "You have selected Adventurer...");
-            //     rCore = addToRobot(0, rCore, scRobotTorsoThin);
-            //     isAsking = 0;
-            // }
-            // else if (key == '2') {
-            //     setDialog("[ SYSTEM ]: ", "You have selected Builder...");
-            //     rCore = addToRobot(0, rCore, scRobotTorsoThick);
-            //     type = BUILDER;
-            //     isAsking = 0;
-            // }
-            // else return;
-           
-            setDialog("[ SYSTEM ]: ", "You are not ");
 
-            rCore = addToRobot(1, rCore, scRobotHeadNormal);
+        if (isAsking) {
             isAsking = 0;
-            nextRoom = getRoom (3, actualRoom);
+            setDialog("[ SYSTEM ]: ", "Moving to next station...");
+            
+            int nextID = -1;
+            if (phase == CORE) nextID = 2;
+            else if (phase == HEAD) nextID = 3;
+            else if (phase == ARMS) nextID = 4;
+            else if (phase == LEGS) nextID = 5;
+            else if (phase == BOOTS) nextID = 6;
 
-            for (int z = nextRoom->depth; z > -(nextRoom->depth)+5; z--) {
-                if (z == 0 || z == 3) scAddRobotTask(rCore, z, 0.0f, 4000);
-                else scAddRobotTask(rCore, 0.0f, 0.0f, z);
+            if (nextID != -1) {
+                nextRoom = getRoom(nextID, actualRoom);
+                if (!nextRoom) printf("ERROR: Room ID %d not found!\n", nextID);
             }
-            rCore->currentX = 0.0f;
-            rCore->currentZ = -(nextRoom->depth)+3;
         }
     }
 
-    else if (key == 13 && isDialogPassive){ // Enter
-        dialogPassed = 1;
-    }
+    if (key == 27) exit(0);
+    if (key == 'z' || key == 'Z') { viewWidthMain -= 0.5; if(viewWidthMain < 1.0) viewWidthMain=1.0; }
+    if (key == 'x' || key == 'X') { viewWidthMain += 0.5; }
 
-    if (key == 27) {
-        exit(0);
-    }
-
-    else if (key == 'z' || key == 'Z') {
-        viewWidthMain -= 0.1;
-        if (viewWidthMain < 1.0) viewWidthMain = 1.0; // Limit zoom
-    }
-
-    else if (key == 'x' || key == 'X') {
-        viewWidthMain += 0.1;
-    }
-
-    else {
-        return;
-    }
     glutPostRedisplay();
 }
