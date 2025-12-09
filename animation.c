@@ -362,6 +362,24 @@ void displayMain() {
     glClearColor(0.678, 0.847, 0.902, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    if (h == 0) h = 1;
+    float aR = (float)w / (float)h;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    if (w >= h) {
+        glOrtho(-viewWidthMain * aR, viewWidthMain * aR, 
+                -viewWidthMain, viewWidthMain, 
+                -100.0, 1000.0);
+    } else {
+        glOrtho(-viewWidthMain, viewWidthMain, 
+                -viewWidthMain / aR, viewWidthMain / aR, 
+                -100.0, 1000.0);
+    }
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -381,7 +399,7 @@ void displayMain() {
         drawRoom(nextRoom);
     glPopMatrix();
 
-    drawDialogueBox(character, dialog);
+    if (isDialogPassive || isAsking) drawDialogueBox(character, dialog);
     if (dialogPassed) {
         dialogPassed = 0;
         isDialogPassive = 0;
@@ -396,6 +414,7 @@ void displayMain() {
             setDialog("[ SYSTEM ]: ", "Okey okey, let's go!!! {press any key to continue}...");
             phase = CORE;
             isAsking = 1;
+            isDialogPassive = 0;
             break;
         case CORE:
             
@@ -554,16 +573,18 @@ void keyboard(unsigned char key, int x, int y) {
         dialogPassed = 1;
     }
 
-    if (key == 27) {
+    else if (key == 27) {
         exit(0);
     }
 
     else if (key == 'z' || key == 'Z') {
-        viewWidthMain -= 0.1;
+        viewWidthMain -= 0.1f;
+        if (viewWidthMain < 1.0f) viewWidthMain = 1.0f; 
     }
 
     else if (key == 'x' || key == 'X') {
-        viewWidthMain += 0.1;
+        viewWidthMain += 0.1f;
+        if (viewWidthMain > 20.0f) viewWidthMain = 20.0f;
     }
 
     else {
