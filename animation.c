@@ -257,6 +257,10 @@ void drawRoom(ROOM *room) {
                 float height = 0.0;
                 while (current != NULL) {
                     glPushMatrix();
+                        if (current->drawId == &scRobot) {
+                            // Dibujamos directamente (funciona en ambas ventanas)
+                            scDrawRobotDirect(rCore); 
+                        }
                         glTranslatef(0.0, height, 0.0);
                         glRotatef(current->angle, 0.0, 1.0, 0.0);
 
@@ -575,7 +579,7 @@ R_CORE *addToRobot(int progress, R_CORE *robot, int drawID) {
         robot->back->drawID = drawID;
     }
 
-    scUpdateRobotPlot(robot);
+    // scUpdateRobotPlot(robot);
 
     return robot;
 }

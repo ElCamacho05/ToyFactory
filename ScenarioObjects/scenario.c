@@ -1275,9 +1275,9 @@ void scInitTestRobot() {
     glEndList();
 }
 
-void scUpdateRobotPlot(R_CORE *robot) {
-    scRobot = glGenLists(1);
-    glNewList(scRobot, GL_COMPILE);
+void scDrawRobotDirect(R_CORE *robot) {
+    // scRobot = glGenLists(1);
+    // glNewList(scRobot, GL_COMPILE);
 
     if (robot) {
         // Core
@@ -1371,7 +1371,7 @@ void scUpdateRobotPlot(R_CORE *robot) {
                 glPopMatrix();
             }
         glPopMatrix();
-        glEndList();
+        // glEndList();
     }
     
 }

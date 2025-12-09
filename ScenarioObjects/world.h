@@ -1,8 +1,10 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include <GL/glut.h>
+
 typedef struct Element { // list of elements
-    int *drawId;
+    GLuint *drawId;
     double angle;
     struct Element *next;
 } ELEMENT;

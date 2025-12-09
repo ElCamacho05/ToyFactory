@@ -95,7 +95,7 @@ void scInitLists();
     void scInitSnowman();
     void scInitRobotParts();
     void scInitTestRobot();
-    void scUpdateRobotPlot(R_CORE *robot);
+    void scDrawRobotDirect(R_CORE *robot);
 
 /*
 DRAWING
