@@ -18,6 +18,7 @@ TEXTURE *rubberTexture;
 TEXTURE *beltTexture;
 TEXTURE *whitePlasticPattern;
 TEXTURE *blockyGold;
+TEXTURE *cardboardTexture;
 
 
 TEXTURE *loadTexture(const char *filename) {
@@ -48,7 +49,7 @@ TEXTURE *loadTexture(const char *filename) {
         glTexImage2D(GL_TEXTURE_2D, 0, format, newTexture->width, newTexture->height, 0, format, GL_UNSIGNED_BYTE, newTexture->data);
         
         // Free RAM, 
-        // stbi_image_free(newTexture->data);
+        stbi_image_free(newTexture->data);
         newTexture->data = NULL; 
     } else {
         printf("FALLO al cargar textura: %s\n", filename);

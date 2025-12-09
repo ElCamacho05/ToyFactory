@@ -84,10 +84,8 @@ void scInitLists();
     void scInitFunnel();
     void scInitStartM();
     void scInitRoboticArm();
+    void scInitBox();
     
-    void scInitToyCar();
-    void scInitRobotConstructorTorso();
-    void scInitRobotExplorerTorso();
     // buildings
     void scInitWall();
     void scInitWindow();
@@ -131,6 +129,7 @@ extern GLuint scChair;
 extern GLuint scStartM;
 extern GLuint scFunnel;
 extern GLuint scRoboticArm;
+extern GLuint scBox;
 // buildings
 extern GLuint scWall;
 extern GLuint scWindow;
@@ -167,6 +166,7 @@ extern GLuint scTestRobot;
     extern GLuint scToolHammer;
     extern GLuint scToolSword;
     extern GLuint scToolLightsaber;
+    
 
 extern int time;
 

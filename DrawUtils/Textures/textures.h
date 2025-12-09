@@ -21,7 +21,7 @@ extern TEXTURE *rubberTexture;
 extern TEXTURE *beltTexture;
 extern TEXTURE *whitePlasticPattern;
 extern TEXTURE *blockyGold;
-
+extern TEXTURE *cardboardTexture;
 
 TEXTURE *loadTexture(const char *filename);
 int genTexture(TEXTURE *texture);

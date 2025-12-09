@@ -361,19 +361,19 @@ void setupMapFactory() {
     }
 
 
-    ROOM *Room10 = createRoom(1, width, depth);
+    ROOM *Room10 = createRoom(10, width, depth);
     linkRooms(factory->initialRoom, Room10);
 
     place(Room10, scChair, 0.0, 2, 4);
     place(Room10, scRoboticArm, 0.0, 0.0, 0.0);
 
-    ROOM *Room20 = createRoom(1, width, depth);
+    ROOM *Room20 = createRoom(20, width, depth);
     linkRooms(Room10, Room20);
 
     place(Room20, scChair, 0.0, 2, 4);
     place(Room20, scRoboticArm, 0.0, 0.0, 0.0);
 
-    ROOM *Room21 = createRoom(1, width, depth);
+    ROOM *Room21 = createRoom(21, width, depth);
     linkRooms(Room10, Room21);
 
     place(Room21, scChair, 0.0, 2, 4);

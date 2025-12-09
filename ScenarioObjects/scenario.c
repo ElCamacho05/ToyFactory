@@ -15,6 +15,7 @@ GLuint scChair = 0;
 GLuint scStartM = 0;
 GLuint scFunnel = 0;
 GLuint scRoboticArm = 0;
+GLuint scBox = 0;
 // buildings
 GLuint scWall = 0;
 GLuint scWindow = 0;
@@ -57,6 +58,7 @@ void scInitLists() {
     scInitFunnel();
     scInitStartM();
     scInitRoboticArm();
+    scInitBox();
     // buildings
     scInitWall();
     scInitWindow();
@@ -447,6 +449,58 @@ void scInitStartM() {
             utDrawTexturedCube(1.0);
         glPopMatrix();
     glEndList();
+}
+
+// CARDBOARD BOX
+void scInitBox() {
+    scBox = glGenLists(1);
+    glNewList(scBox, GL_COMPILE);
+
+        applyMaterial(&matWhiteWall); 
+        glEnable(GL_TEXTURE_2D);
+        boundTexture(cardboardTexture);
+
+        glPushMatrix();
+            glTranslatef(0.0f, 0.05f, 0.0f);
+            glScalef(1.4f, 0.1f, 1.4f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // -x
+        glPushMatrix();
+            glTranslatef(-0.65f, 0.5f, 0.0f);
+            glScalef(0.1f, 0.9f, 1.4f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // +x
+        glPushMatrix();
+            glTranslatef(0.65f, 0.5f, 0.0f); 
+            glScalef(0.1f, 0.9f, 1.4f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // -z
+        glPushMatrix();
+            glTranslatef(0.0f, 0.5f, -0.65f); 
+            glScalef(1.2f, 0.9f, 0.1f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        // +z
+        glPushMatrix();
+            glTranslatef(0.0f, 0.5f, 0.65f); 
+            glScalef(1.2f, 0.9f, 0.1f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+
+        glDisable(GL_TEXTURE_2D);
+
+    glEndList();
+}
+
+void scDrawBox() {
+    glCallList(scBox);
 }
 
 void scDrawStartM() {
