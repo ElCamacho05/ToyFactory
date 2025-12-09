@@ -364,7 +364,7 @@ void scInitFunnel() {
         // brass casing
         applyMaterial(&matWhiteWall);
         glEnable(GL_TEXTURE_2D);
-        if (blockyGold) boundTexture(blockyGold);
+        boundTexture(blockyGold);
 
             // Top Plate
             glPushMatrix();
@@ -455,44 +455,42 @@ void scInitStartM() {
 void scInitBox() {
     scBox = glGenLists(1);
     glNewList(scBox, GL_COMPILE);
-
         applyMaterial(&matWhiteWall); 
         glEnable(GL_TEXTURE_2D);
-        boundTexture(cardboardTexture);
+            boundTexture(cardboardTexture);
+            glPushMatrix();
+                glTranslatef(0.0f, 0.05f, 0.0f);
+                glScalef(1.0f, 0.1f, 1.0f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
 
-        glPushMatrix();
-            glTranslatef(0.0f, 0.05f, 0.0f);
-            glScalef(1.4f, 0.1f, 1.4f);
-            utDrawTexturedCube(1.0f);
-        glPopMatrix();
+            // -x
+            glPushMatrix();
+                glTranslatef(-0.5f, 0.5f, 0.0f);
+                glScalef(0.1f, 0.9f, 1.0f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
 
-        // -x
-        glPushMatrix();
-            glTranslatef(-0.65f, 0.5f, 0.0f);
-            glScalef(0.1f, 0.9f, 1.4f);
-            utDrawTexturedCube(1.0f);
-        glPopMatrix();
+            // +x
+            glPushMatrix();
+                glTranslatef(0.5f, 0.5f, 0.0f); 
+                glScalef(0.1f, 0.9f, 1.0f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
 
-        // +x
-        glPushMatrix();
-            glTranslatef(0.65f, 0.5f, 0.0f); 
-            glScalef(0.1f, 0.9f, 1.4f);
-            utDrawTexturedCube(1.0f);
-        glPopMatrix();
+            // -z
+            glPushMatrix();
+                glTranslatef(0.0f, 0.5f, -0.5f); 
+                glScalef(1.0f, 0.9f, 0.1f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
 
-        // -z
-        glPushMatrix();
-            glTranslatef(0.0f, 0.5f, -0.65f); 
-            glScalef(1.2f, 0.9f, 0.1f);
-            utDrawTexturedCube(1.0f);
-        glPopMatrix();
-
-        // +z
-        glPushMatrix();
-            glTranslatef(0.0f, 0.5f, 0.65f); 
-            glScalef(1.2f, 0.9f, 0.1f);
-            utDrawTexturedCube(1.0f);
-        glPopMatrix();
+            // +z
+            glPushMatrix();
+                glTranslatef(0.0f, 0.5f, 0.5f); 
+                glScalef(1.0f, 0.9f, 0.1f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
 
         glDisable(GL_TEXTURE_2D);
 

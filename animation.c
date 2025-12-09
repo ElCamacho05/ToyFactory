@@ -177,7 +177,7 @@ void setupTextures() {
     brickTexture = loadTexture("DrawUtils/Textures/Files/brick.jpg");
     // whitePlasticPattern = loadTexture("DrawUtils/Textures/Files/white-plastic-pattern.png");
     blockyGold = loadTexture("DrawUtils/Textures/Files/blocky-gold.png");
-    cardboardTexture = blockyGold = loadTexture("DrawUtils/Textures/Files/cardboard.jpg");
+    cardboardTexture = loadTexture("DrawUtils/Textures/Files/cardboard.jpg");
 }
 
 void drawCurrentRoomBorder(ROOM *room) {

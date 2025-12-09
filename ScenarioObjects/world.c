@@ -333,6 +333,9 @@ void setupMapFactory() {
     // Robotic Arm
     place(factory->initialRoom, scRoboticArm, 180.0, 3, 1);
 
+    // Cardboard Box
+    place(factory->initialRoom, scBox, 180.0, 4, 0);
+
     // Christmas Tree
     place(factory->initialRoom, scChristmasTree, 0.0, -3, -3);
 
