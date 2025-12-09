@@ -1222,3 +1222,54 @@ void scInitTestRobot() {
 void scDrawTestRobot() {
     glCallList(scTestRobot);
 }
+
+R_CORE *scCreateRobotInstance() {
+    R_CORE *robot = (R_CORE*) malloc(sizeof(R_CORE));
+    if (!robot) return NULL;
+
+    robot->drawID = scRobotTorsoThin;
+    robot->head = NULL;
+    robot->arms = NULL;
+    robot->legs = NULL;
+    robot->back = NULL;
+    
+    robot->taskQueue = NULL;
+    robot->taskQueueLast = NULL;
+    
+    robot->currentX = 0.0f;
+    robot->currentZ = 0.0f;
+    robot->isMoving = 0;
+
+    return robot;
+}
+
+void scAddRobotTask(R_CORE *robot, float targetX, float targetZ) {
+    if (!robot) return;
+
+    R_TASK *newTask = (R_TASK*) malloc(sizeof(R_TASK));
+    newTask->x = targetX;
+    newTask->z = targetZ;
+    newTask->next = NULL;
+
+    if (robot->taskQueue == NULL) {
+        robot->taskQueue = newTask;
+        robot->taskQueueLast = newTask;
+    } else {
+        robot->taskQueueLast->next = newTask;
+        robot->taskQueueLast = newTask;
+    }
+    printf("Tarea agregada al robot: Ir a (%.1f, %.1f)\n", targetX, targetZ);
+}
+
+R_TASK *scPopRobotTask(R_CORE *robot) {
+    if (!robot || !robot->taskQueue) return NULL;
+
+    R_TASK *task = robot->taskQueue;
+    robot->taskQueue = task->next;
+    
+    if (robot->taskQueue == NULL) {
+        robot->taskQueueLast = NULL;
+    }
+
+    return task;
+}

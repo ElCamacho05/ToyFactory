@@ -5,15 +5,22 @@
 #include "../DrawUtils/Materials/materials.h"
 #include "../DrawUtils/Textures/textures.h"
 
+
+
 typedef struct RobotCore R_CORE;
     typedef struct RobotHead R_HEAD;
         typedef struct RobotAcc R_F_ACC;
     typedef struct RobotArms R_ARMS;
-        typedef struct RobotHands R_HANDS;
             typedef struct RobotTool R_TOOL;
     typedef struct RobotLegs R_LEGS;
         typedef struct RobotBoots R_BOOTS;
     typedef struct RobotBack R_BACK;
+
+typedef struct RobotTask {
+    float x;
+    float z;
+    struct RobotTask *next;
+} R_TASK;
 
 typedef struct RobotCore {
     int drawID;
@@ -21,6 +28,14 @@ typedef struct RobotCore {
     R_ARMS *arms;
     R_LEGS *legs;
     R_BACK *back;
+
+    R_TASK *taskQueue;
+    R_TASK *taskQueueLast;
+    
+    float currentX;
+    float currentZ;
+    int isMoving;
+
 } R_CORE;
 
     typedef struct RobotHead {
@@ -34,7 +49,7 @@ typedef struct RobotCore {
 
     typedef struct RobotArms {
         int drawID;
-        R_HANDS *hand;
+        R_TOOL *tool;
     } R_ARMS;
 
         typedef struct RobotTool {
@@ -53,6 +68,10 @@ typedef struct RobotCore {
     typedef struct RobotBack {
         int drawID;
     } R_BACK;
+
+R_CORE *scCreateRobotInstance();
+void scAddRobotTask(R_CORE *robot, float targetX, float targetZ);
+R_TASK *scPopRobotTask(R_CORE *robot);
 
 void scInitLists();
     // furniture

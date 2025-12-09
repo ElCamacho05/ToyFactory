@@ -48,6 +48,21 @@ ROOM *actualRoom;
 ROOM *nextRoom = NULL;
 int isAsking = 1;
 
+enum PHASE{
+    START,
+    CORE,
+    HEAD,
+    ARMS,
+    LEGS,
+    BOOTS,
+    TOOLS,
+    H_ACC,
+    BACK
+};
+R_CORE *rCore;
+
+int phase = START;
+
 int screenChanging = 0;;
 float upElevation = 0.0;
 
@@ -101,6 +116,7 @@ int main(int argc, char **argv) {
     actualMap = factory;
     actualRoom = actualMap->initialRoom;
     firstRoom = actualMap->initialRoom;
+    rCore = NULL;
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
 
@@ -377,7 +393,6 @@ void animation() {
         } 
         else {
             upElevation = upElevation + 0.1f;
-            printf("elevating: %f\n", upElevation);
         }
     }
     if (mainWindow > 0) {
