@@ -448,6 +448,7 @@ void setupMapFactory() {
     ROOM *Room2 = createRoom(2, 6, 6);
     linkRooms(Room1, Room2);
     setupIntermediateRooms(Room2);
+    place(Room2, &scRobot, 0.0, -2.0, 0.0);
 
     /*
     HEAD
@@ -455,5 +456,6 @@ void setupMapFactory() {
     ROOM *Room3 = createRoom(3, 6, 6);
     linkRooms(Room2, Room3);
     setupIntermediateRooms(Room3);
+    place(Room3, &scRobot, 0.0, -2.0, 0.0);
 }
 

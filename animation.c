@@ -79,6 +79,7 @@ enum TYPE {
 
 int phase = START;
 int type = -1;
+int robotDelay = 1000;
 
 int screenChanging = 0;;
 float upElevation = 0.0;
@@ -441,10 +442,11 @@ void displayMain() {
             setDialog("[ SYSTEM ]: ", "Ready for building your Robot? {press ENTER key to continue}...");
             phase = READY;
             isDialogPassive = 1;
-            nextRoom = getRoom(1, actualRoom);
+            // nextRoom = getRoom(1, actualRoom);
             break;
         case READY:
             setDialog("[ SYSTEM ]: ", "Which type of robot do you wan't to build? 1) adventurer 2) builder");
+            phase = CORE;
             isAsking = 1;
             
             break;
@@ -674,35 +676,21 @@ void keyboard(unsigned char key, int x, int y) {
             nextRoom = getRoom (2, actualRoom);
 
             for (int x = nextRoom->width; x > -(nextRoom->width)+5; x--) {
-                if (x == 0 || x == 3) scAddRobotTask(rCore, x, 0.0f, 4000);
+                if (x == 0 || x == 3) scAddRobotTask(rCore, x, 0.0f, robotDelay);
                 else scAddRobotTask(rCore, x, 0.0f, 0);
             }
             rCore->currentX = -(nextRoom->width)+3;
             rCore->currentZ = 0.0f;
         }
         if (phase == CORE){
-            // if (key == '1') {
-            //     type = ADVENTURER;
-            //     setDialog("[ SYSTEM ]: ", "You have selected Adventurer...");
-            //     rCore = addToRobot(0, rCore, scRobotTorsoThin);
-            //     isAsking = 0;
-            // }
-            // else if (key == '2') {
-            //     setDialog("[ SYSTEM ]: ", "You have selected Builder...");
-            //     rCore = addToRobot(0, rCore, scRobotTorsoThick);
-            //     type = BUILDER;
-            //     isAsking = 0;
-            // }
-            // else return;
-           
             setDialog("[ SYSTEM ]: ", "You are not ");
 
             rCore = addToRobot(1, rCore, scRobotHeadNormal);
             isAsking = 0;
             nextRoom = getRoom (3, actualRoom);
 
-            for (int z = nextRoom->depth; z > -(nextRoom->depth)+5; z--) {
-                if (z == 0 || z == 3) scAddRobotTask(rCore, z, 0.0f, 4000);
+            for (int z = nextRoom->depth; z > -(nextRoom->depth); z--) {
+                if (z == 0 || z == 3) scAddRobotTask(rCore, z, 0.0f, robotDelay);
                 else scAddRobotTask(rCore, 0.0f, 0.0f, z);
             }
             rCore->currentX = 0.0f;
