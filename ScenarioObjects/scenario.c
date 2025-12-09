@@ -25,7 +25,6 @@ GLuint scDarkDoor = 0;
 GLuint scSnowman = 0;
 
 R_CORE *rCore = NULL;
-
 /*
 MAIN CHARACTER: ROBOT
 */
@@ -1284,7 +1283,16 @@ void scDrawRobotDirect(R_CORE *robot) {
     if (robot) {
         // Core
         glPushMatrix();
+
             glTranslatef(robot->currentX, 0.9f, robot->currentZ); 
+            setLightPosition(&robotLight, 0.0f, 3.0f, 0.0f);
+            glDisable(GL_LIGHTING);
+            glColor3f(1.0f, 1.0f, 0.0f);
+            glPushMatrix();
+                glTranslatef(0.0f, 2.0f, 0.0f);
+                glutSolidSphere(0.1, 10, 10);
+            glPopMatrix();
+            glEnable(GL_LIGHTING);
 
             glCallList(robot->drawID);
             if (robot->head) {

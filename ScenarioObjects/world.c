@@ -305,6 +305,41 @@ void setupCoreRoom(ROOM *room) {
     }
 }
 
+void setupFactoryRoom(ROOM *factory) {
+    // our hero!!!
+    // place(factory, &scTestRobot, 90.0, 2.0, 2.0);
+
+    // Snowman
+    place(factory, &scSnowman, 0.0, 3, -1);
+    // Start Machine
+    place(factory, &scStartM, 0.0, 0, 0);
+    // Robotic Arm
+    place(factory, &scRoboticArm, 180.0, 3, 1);
+    // Cardboard Box
+    place(factory, &scBox, 180.0, 4, 0);
+    // Christmas Tree
+    place(factory, &scChristmasTree, 0.0, -3, -3);
+    // Walls
+    place(factory, &scWall, 0.0, 4, -4);
+    place(factory, &scWall, 0.0, 3, -4);
+    place(factory, &scDoor, 0.0, 2, -4);
+    place(factory, &scWall, 0.0, 1, -4);
+    place(factory, &scWindow, 0.0, 0, -4);
+    place(factory, &scWindow, 0.0, -1, -4);
+    place(factory, &scWall, 0.0, -2, -4);
+    place(factory, &scWall, 0.0, -3, -4);
+    // Chair
+    place(factory, &scChair, 0.0, -3, 1);
+    // Table
+    place(factory, &scTable, 0.0, -3, 2);
+    // Lamp
+    place(factory, &scLamp, 0.0, -3, 2);
+    // Walls (X = -4, Z [-3,3])
+    for (int z = -3; z <= 4; z++) {
+        place(factory, &scWall, 90.0, -4, z);
+    }
+}
+
 // OTHER ROOMS
 void setupIntermediateRooms(ROOM *room) {
     int w = room->width;
@@ -312,12 +347,12 @@ void setupIntermediateRooms(ROOM *room) {
 
     // place(room, scDarkDoor, 90.0, w, 0); 
 
-    place(room, &scFunnel, -90.0, w, 0);
 
     for (int x = -w; x <= w; x++) {
         place(room, &scConveyorBelt, 0.0, x, 0);
     }
 
+    place(room, &scFunnel, -90.0, w, 0);
 
     place(room, &scRoboticArm, 180.0, 1, 1); 
     place(room, &scRoboticArm, 0.0, -2, -1);
@@ -398,46 +433,46 @@ void setupMapFactory() {
     1: INITIAL MAP
     */
     factory = (MAP *) malloc(sizeof(MAP));
-    factory->initialRoom = createRoom(0, width, depth);
+    factory->initialRoom = createRoom(0, 4, 4);
 
     firstRoom = factory->initialRoom;
-    // our hero!!!
-    place(factory->initialRoom, &scTestRobot, 90.0, 2.0, 2.0);
+    setupFactoryRoom(firstRoom);
+    // // our hero!!!
+    // place(factory->initialRoom, &scTestRobot, 90.0, 2.0, 2.0);
 
-    // Snowman
-    place(factory->initialRoom, &scSnowman, 0.0, 3, -1);
-    // Start Machine
-    place(factory->initialRoom, &scStartM, 0.0, 0, 0);
-    // Robotic Arm
-    place(factory->initialRoom, &scRoboticArm, 180.0, 3, 1);
-    // Cardboard Box
-    place(factory->initialRoom, &scBox, 180.0, 4, 0);
-    // Christmas Tree
-    place(factory->initialRoom, &scChristmasTree, 0.0, -3, -3);
-    // Walls
-    place(factory->initialRoom, &scWall, 0.0, 4, -4);
-    place(factory->initialRoom, &scWall, 0.0, 3, -4);
-    place(factory->initialRoom, &scDoor, 0.0, 2, -4);
-    place(factory->initialRoom, &scWall, 0.0, 1, -4);
-    place(factory->initialRoom, &scWindow, 0.0, 0, -4);
-    place(factory->initialRoom, &scWindow, 0.0, -1, -4);
-    place(factory->initialRoom, &scWall, 0.0, -2, -4);
-    place(factory->initialRoom, &scWall, 0.0, -3, -4);
-    // Chair
-    place(factory->initialRoom, &scChair, 0.0, -3, 1);
-    // Table
-    place(factory->initialRoom, &scTable, 0.0, -3, 2);
-    // Lamp
-    place(factory->initialRoom, &scLamp, 0.0, -3, 2);
-    // Walls (X = -4, Z [-3,3])
-    for (int z = -3; z <= 4; z++) {
-        place(factory->initialRoom, &scWall, 90.0, -4, z);
-    }
+    // // Snowman
+    // place(factory->initialRoom, &scSnowman, 0.0, 3, -1);
+    // // Start Machine
+    // place(factory->initialRoom, &scStartM, 0.0, 0, 0);
+    // // Robotic Arm
+    // place(factory->initialRoom, &scRoboticArm, 180.0, 3, 1);
+    // // Cardboard Box
+    // place(factory->initialRoom, &scBox, 180.0, 4, 0);
+    // // Christmas Tree
+    // place(factory->initialRoom, &scChristmasTree, 0.0, -3, -3);
+    // // Walls
+    // place(factory->initialRoom, &scWall, 0.0, 4, -4);
+    // place(factory->initialRoom, &scWall, 0.0, 3, -4);
+    // place(factory->initialRoom, &scDoor, 0.0, 2, -4);
+    // place(factory->initialRoom, &scWall, 0.0, 1, -4);
+    // place(factory->initialRoom, &scWindow, 0.0, 0, -4);
+    // place(factory->initialRoom, &scWindow, 0.0, -1, -4);
+    // place(factory->initialRoom, &scWall, 0.0, -2, -4);
+    // place(factory->initialRoom, &scWall, 0.0, -3, -4);
+    // // Chair
+    // place(factory->initialRoom, &scChair, 0.0, -3, 1);
+    // // Table
+    // place(factory->initialRoom, &scTable, 0.0, -3, 2);
+    // // Lamp
+    // place(factory->initialRoom, &scLamp, 0.0, -3, 2);
+    // // Walls (X = -4, Z [-3,3])
+    // for (int z = -3; z <= 4; z++) {
+    //     place(factory->initialRoom, &scWall, 90.0, -4, z);
+    // }
 
     // CORE (ID 1)
     ROOM *Room1 = createRoom(1, 6, 6);
     linkRooms(factory->initialRoom, Room1);
-    setupCoreRoom(Room1);
     setupCoreRoom(Room1);
     place(Room1, &scRobot, 0.0, -2.0, 0.0);
 
@@ -469,11 +504,28 @@ void setupMapFactory() {
     setupIntermediateRooms(Room5);
     place(Room5, &scRobot, 0.0, -2.0, 0.0);
 
-    
-    // FIN (ID 6)
+    // END (ID 6)
     ROOM *Room6 = createRoom(6, 6, 6);
     linkRooms(Room5, Room6);
     setupIntermediateRooms(Room6);
-    place(Room5, &scRobot, 0.0, -2.0, 0.0);
+    place(Room6, &scRobot, 0.0, -2.0, 0.0);
+
+    // END (ID 7)
+    ROOM *Room7 = createRoom(7, 6, 6);
+    linkRooms(Room6, Room7);
+    setupIntermediateRooms(Room7);
+    place(Room7, &scRobot, 0.0, -2.0, 0.0);
+
+    // END (ID 8)
+    ROOM *Room8 = createRoom(8, 6, 6);
+    linkRooms(Room7, Room8);
+    setupIntermediateRooms(Room8);
+    place(Room8, &scRobot, 0.0, -2.0, 0.0);
+
+    // END (ID 9)
+    ROOM *Room9 = createRoom(9, 6, 6);
+    linkRooms(Room8, Room9);
+    setupFactoryRoom(Room9);
+    place(Room9, &scRobot, 45.0, 2.0, 2.0);
 }
 

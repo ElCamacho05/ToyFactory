@@ -13,6 +13,8 @@ double tessLevel = 0.25;
 GLint maxL = 24;               // Maximo numero de luces soportadas por OpenGL
 GLint GL_LID = 0;             // ID de la siguiente luz disponible
 
+LIGHT robotLight;
+
 LIGHT testLight =  
 {
     .position    =  {0,0,0,1},

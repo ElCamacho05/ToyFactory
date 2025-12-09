@@ -82,6 +82,6 @@ extern GLint GL_LID;
 extern GLint maxL;
 
 extern LIGHT testLight;
-
+extern LIGHT robotLight;
 
 #endif
