@@ -46,7 +46,9 @@ long beforeSceneTime = 0.0;
 MAP *actualMap;;
 ROOM *actualRoom;
 ROOM *nextRoom = NULL;
-int isAsking = 1;
+int isAsking = 0;
+int iRtF = 0;
+char roomToFind[20];
 
 enum PHASE{
     START,
@@ -168,7 +170,6 @@ void setupTextures() {
     darkPlanksTexture = loadTexture("DrawUtils/Textures/Files/dark-planks.jpg");
     whiteWoodTexture = loadTexture("DrawUtils/Textures/Files/white-wood.jpg");
     whitePlanksTexture = loadTexture("DrawUtils/Textures/Files/white-planks.png");
-
     // materials
     wallTexture = loadTexture("DrawUtils/Textures/Files/wall.jpg");
     rubberTexture = loadTexture("DrawUtils/Textures/Files/rubber.jpg");
@@ -176,6 +177,7 @@ void setupTextures() {
     brickTexture = loadTexture("DrawUtils/Textures/Files/brick.jpg");
     // whitePlasticPattern = loadTexture("DrawUtils/Textures/Files/white-plastic-pattern.png");
     blockyGold = loadTexture("DrawUtils/Textures/Files/blocky-gold.png");
+    cardboardTexture = blockyGold = loadTexture("DrawUtils/Textures/Files/cardboard.jpg");
 }
 
 void drawCurrentRoomBorder(ROOM *room) {
@@ -203,7 +205,7 @@ void drawCurrentRoomBorder(ROOM *room) {
     glColor3f(1.0f, 1.0f, 1.0f);
 }
 
-void drawRoom(ROOM *room) {    
+void drawRoom(ROOM *room) {
     if (!room) return;
     TILE **tiles = (room->tileArray); 
     
@@ -432,17 +434,57 @@ void keyboard(unsigned char key, int x, int y) {
     }
 
     // Initial room. Main Menu
-    if (isdigit(key) && isAsking) {
-        int roomID = key - '0';
-        ROOM *newRoom = getRoom(roomID, actualRoom);
-        if (newRoom) {
-            screenChanging = glutGet(GLUT_ELAPSED_TIME);
-            nextRoom = newRoom;
-        }
+    // if (isdigit(key) && isAsking) {
+    //     int roomID = key - '0';
+    //     ROOM *newRoom = getRoom(roomID, actualRoom);
+    //     if (newRoom) {
+    //         screenChanging = glutGet(GLUT_ELAPSED_TIME);
+    //         nextRoom = newRoom;
+    //     }
 
-        else {
-            printf("Room %d not found (404)\n", roomID);
+    //     else {
+    //         printf("Room %d not found (404)\n", roomID);
+    //     }
+    // }
+
+    if (isAsking) {
+        if (key == 27) { // ESC to cancel search
+                isAsking = 0;
+                roomToFind[0] = '\0'; // clear string
+                iRtF = -1;
+                printf("[ SEARCH CANCELED ]\n");
+                return;
+            }
+        // Enter
+        if (key == 13) {
+            // Clean string and look for the person
+            isAsking = 0;
+            roomToFind[iRtF] = '\0';
+            iRtF = 0;
+
+            printf("[ SEARCHING PERSON... '%s' ] \n", roomToFind);
+            int Pid = atoi(roomToFind);
+            ROOM *found = getRoom(Pid, actualRoom);
+            if (found) {
+                roomToFind[0] = '\0';
+                nextRoom = found;
+            } else {
+                printf("[ ROOM '%s' not found ]\n", roomToFind);
+            }
         }
+        // Backspace
+        else if (key == 8) {
+            if (iRtF > 0) {
+                iRtF--;
+                roomToFind[iRtF] = '\0';
+            }
+        }
+        // Add word to the search string
+        else if (iRtF < sizeof(roomToFind) - 1) {
+            roomToFind[iRtF++] = key;
+            roomToFind[iRtF] = '\0';
+        }
+        return;
     }
 
     else {
