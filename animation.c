@@ -73,10 +73,10 @@ void displaySecondary();
 void animation();
 void initGL();
 void setupSceneLighting();
+void setupTextures();
 void drawRoom(ROOM *room);
 void drawTreeRecursive(ROOM *room, float x, float z, float xGap, float zGap);
 void drawMultipleRooms(ROOM *root, float xSpace, float zSpace);
-void setupTextures();
 void drawCurrentRoomBorder(ROOM *room);
 void keyboard(unsigned char key, int x, int y);
 void reshapeMain(int w, int h);
@@ -152,6 +152,18 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+// SETUP INITIAL ELEMENTS
+void initGL() {
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_SMOOTH);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, 1.0, 0.1, 1000.0); 
+    glMatrixMode(GL_MODELVIEW);
+}
 
 void setupSceneLighting() {
     streetLight1 = getStreetLampConfig();
@@ -180,6 +192,7 @@ void setupTextures() {
     cardboardTexture = loadTexture("DrawUtils/Textures/Files/cardboard.jpg");
 }
 
+// Function that draws a red border around a room
 void drawCurrentRoomBorder(ROOM *room) {
     if (!room) return;
 
@@ -205,6 +218,7 @@ void drawCurrentRoomBorder(ROOM *room) {
     glColor3f(1.0f, 1.0f, 1.0f);
 }
 
+// Fully automated room drawing
 void drawRoom(ROOM *room) {
     if (!room) return;
     TILE **tiles = (room->tileArray); 
@@ -327,6 +341,7 @@ void drawMultipleRooms(ROOM *rootRoom, float xSpace, float zSpace) {
     drawTreeRecursive(startNode, 0.0f, 0.0f, xSpace, zSpace);
 }
 
+// FOR THE MAIN WINDOW
 void displayMain() {
     glClearColor(0.678, 0.847, 0.902, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -354,6 +369,31 @@ void displayMain() {
     glutSwapBuffers();
 }
 
+void reshapeMain(int w, int h) {
+    if (h == 0) h = 1;
+    
+    glViewport(0, 0, w, h);
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
+    float aR = (float)w / (float)h;
+    
+    // glOrtho(left, right, bottom, top, near, far)
+    if (w >= h) {
+        glOrtho(-viewWidthMain * aR, viewWidthMain * aR, 
+                -viewWidthMain, viewWidthMain, 
+                -100.0, 1000.0);
+    } else {
+        glOrtho(-viewWidthMain, viewWidthMain, 
+                -viewWidthMain / aR, viewWidthMain / aR, 
+                -100.0, 1000.0);
+    }
+    
+    glMatrixMode(GL_MODELVIEW);
+}
+
+// FOR THE SECONDARY WINDOW
 void displaySecondary() {
     glClearColor(0.678, 0.847, 0.902, 1.0); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -371,6 +411,31 @@ void displaySecondary() {
     glutSwapBuffers();
 }
 
+void reshapeSecondary(int w, int h) {
+    if (h == 0) h = 1;
+    
+    glViewport(0, 0, w, h);
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
+    float aR = (float)w / (float)h; // aspect ratio
+    
+    // glOrtho(left, right, bottom, top, near, far)
+    if (w >= h) {
+        glOrtho(-viewWidthSecondary * aR, viewWidthSecondary * aR, 
+                -viewWidthSecondary, viewWidthSecondary, 
+                -100.0, 1000.0);
+    } else {
+        glOrtho(-viewWidthSecondary, viewWidthSecondary, 
+                -viewWidthSecondary / aR, viewWidthSecondary / aR, 
+                -100.0, 1000.0);
+    }
+    
+    glMatrixMode(GL_MODELVIEW);
+}
+
+// SHARED ANIMATION CYCLE
 void animation() {
     long now = glutGet(GLUT_ELAPSED_TIME);
     sceneTime = now - beforeSceneTime;
@@ -408,18 +473,7 @@ void animation() {
     glutPostRedisplay();
 }
 
-void initGL() {
-    glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_NORMALIZE);
-    glShadeModel(GL_SMOOTH);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0, 1.0, 0.1, 1000.0); 
-    glMatrixMode(GL_MODELVIEW);
-}
-
+// SHARED KEYBOARD
 void keyboard(unsigned char key, int x, int y) {
     if (key == 27) {
         exit(0);
@@ -491,52 +545,4 @@ void keyboard(unsigned char key, int x, int y) {
         return;
     }
     glutPostRedisplay();
-}
-
-void reshapeMain(int w, int h) {
-    if (h == 0) h = 1;
-    
-    glViewport(0, 0, w, h);
-    
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    
-    float aR = (float)w / (float)h;
-    
-    // glOrtho(left, right, bottom, top, near, far)
-    if (w >= h) {
-        glOrtho(-viewWidthMain * aR, viewWidthMain * aR, 
-                -viewWidthMain, viewWidthMain, 
-                -100.0, 1000.0);
-    } else {
-        glOrtho(-viewWidthMain, viewWidthMain, 
-                -viewWidthMain / aR, viewWidthMain / aR, 
-                -100.0, 1000.0);
-    }
-    
-    glMatrixMode(GL_MODELVIEW);
-}
-
-void reshapeSecondary(int w, int h) {
-    if (h == 0) h = 1;
-    
-    glViewport(0, 0, w, h);
-    
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    
-    float aR = (float)w / (float)h; // aspect ratio
-    
-    // glOrtho(left, right, bottom, top, near, far)
-    if (w >= h) {
-        glOrtho(-viewWidthSecondary * aR, viewWidthSecondary * aR, 
-                -viewWidthSecondary, viewWidthSecondary, 
-                -100.0, 1000.0);
-    } else {
-        glOrtho(-viewWidthSecondary, viewWidthSecondary, 
-                -viewWidthSecondary / aR, viewWidthSecondary / aR, 
-                -100.0, 1000.0);
-    }
-    
-    glMatrixMode(GL_MODELVIEW);
 }
