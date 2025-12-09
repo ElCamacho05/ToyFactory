@@ -6,6 +6,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "ScenarioObjects/scenario.h"
 #include "ScenarioObjects/world.h"
@@ -46,12 +47,18 @@ long beforeSceneTime = 0.0;
 MAP *actualMap;;
 ROOM *actualRoom;
 ROOM *nextRoom = NULL;
+
+int isDialogPassive = 1;
+int dialogPassed = 0;
+char character[30];
+char dialog[100];
 int isAsking = 0;
 int iRtF = 0;
 char roomToFind[20];
 
 enum PHASE{
     START,
+    READY,
     CORE,
     HEAD,
     ARMS,
@@ -59,7 +66,8 @@ enum PHASE{
     BOOTS,
     TOOLS,
     H_ACC,
-    BACK
+    BACK,
+    FREE
 };
 R_CORE *rCore;
 
@@ -77,6 +85,7 @@ void setupTextures();
 void drawRoom(ROOM *room);
 void drawTreeRecursive(ROOM *room, float x, float z, float xGap, float zGap);
 void drawMultipleRooms(ROOM *root, float xSpace, float zSpace);
+void setDialog(char *chrctr, char *dlg);
 void drawCurrentRoomBorder(ROOM *room);
 void keyboard(unsigned char key, int x, int y);
 void reshapeMain(int w, int h);
@@ -119,6 +128,7 @@ int main(int argc, char **argv) {
     actualRoom = actualMap->initialRoom;
     firstRoom = actualMap->initialRoom;
     rCore = NULL;
+    setDialog("[ SYSTEM ]: ", "Welcome to the toy factory!!! {press any key to continue}...");
 
     // startTime = glutGet(GLUT_ELAPSED_TIME);
 
@@ -134,7 +144,7 @@ int main(int argc, char **argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(960, 960); 
     glutInitWindowPosition(961, 0);
-    secondaryWindow = glutCreateWindow("Christmas Factory - Main");
+    secondaryWindow = glutCreateWindow("Christmas Factory - Secondary");
 
     // map setup for secondary window
     initGL();
@@ -341,6 +351,12 @@ void drawMultipleRooms(ROOM *rootRoom, float xSpace, float zSpace) {
     drawTreeRecursive(startNode, 0.0f, 0.0f, xSpace, zSpace);
 }
 
+// Set dialog message data
+void setDialog(char *chrctr, char *dlg) {
+    strcpy(character, chrctr);
+    strcpy(dialog, dlg);
+}
+
 // FOR THE MAIN WINDOW
 void displayMain() {
     glClearColor(0.678, 0.847, 0.902, 1.0); 
@@ -353,6 +369,7 @@ void displayMain() {
               camPointTo[X], camPointTo[Y], camPointTo[Z],
               0.0, 1.0, 0.0);
 
+    
     glPushMatrix();
         glTranslatef(0.0, upElevation, 0.0);
         // drawMap(test);
@@ -364,7 +381,31 @@ void displayMain() {
         drawRoom(nextRoom);
     glPopMatrix();
 
-    drawDialogueBox("[ SYSTEM ]:", "WELCOME TO THE TOY FACTORY... (Press any key to continue) ");
+    drawDialogueBox(character, dialog);
+    if (dialogPassed) {
+        dialogPassed = 0;
+        isDialogPassive = 0;
+        switch (phase)
+        {
+        case START:
+            setDialog("[ SYSTEM ]: ", "Ready for building your Robot? {press any key to continue}...");
+            phase = READY;
+            isDialogPassive = 1;
+            break;
+        case READY:
+            setDialog("[ SYSTEM ]: ", "Okey okey, let's go!!! {press any key to continue}...");
+            phase = CORE;
+            isAsking = 1;
+            break;
+        case CORE:
+            
+            break;
+        default:
+            break;
+        }
+
+    }
+
 
     glutSwapBuffers();
 }
@@ -475,40 +516,7 @@ void animation() {
 
 // SHARED KEYBOARD
 void keyboard(unsigned char key, int x, int y) {
-    if (key == 27) {
-        exit(0);
-    }
-
-    else if (key == 'z' || key == 'Z') {
-        viewWidthMain -= 0.1;
-    }
-
-    else if (key == 'x' || key == 'X') {
-        viewWidthMain += 0.1;
-    }
-
-    // Initial room. Main Menu
-    // if (isdigit(key) && isAsking) {
-    //     int roomID = key - '0';
-    //     ROOM *newRoom = getRoom(roomID, actualRoom);
-    //     if (newRoom) {
-    //         screenChanging = glutGet(GLUT_ELAPSED_TIME);
-    //         nextRoom = newRoom;
-    //     }
-
-    //     else {
-    //         printf("Room %d not found (404)\n", roomID);
-    //     }
-    // }
-
     if (isAsking) {
-        if (key == 27) { // ESC to cancel search
-                isAsking = 0;
-                roomToFind[0] = '\0'; // clear string
-                iRtF = -1;
-                printf("[ SEARCH CANCELED ]\n");
-                return;
-            }
         // Enter
         if (key == 13) {
             // Clean string and look for the person
@@ -524,6 +532,7 @@ void keyboard(unsigned char key, int x, int y) {
                 nextRoom = found;
             } else {
                 printf("[ ROOM '%s' not found ]\n", roomToFind);
+                isAsking = 1;
             }
         }
         // Backspace
@@ -539,6 +548,22 @@ void keyboard(unsigned char key, int x, int y) {
             roomToFind[iRtF] = '\0';
         }
         return;
+    }
+
+    else if (key == 13 && isDialogPassive){ // Enter
+        dialogPassed = 1;
+    }
+
+    if (key == 27) {
+        exit(0);
+    }
+
+    else if (key == 'z' || key == 'Z') {
+        viewWidthMain -= 0.1;
+    }
+
+    else if (key == 'x' || key == 'X') {
+        viewWidthMain += 0.1;
     }
 
     else {
