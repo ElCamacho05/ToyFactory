@@ -19,6 +19,7 @@ GLuint scRoboticArm = 0;
 GLuint scWall = 0;
 GLuint scWindow = 0;
 GLuint scDoor = 0;
+GLuint scDarkDoor = 0;
 // characters
 GLuint scSnowman = 0;
 /*
@@ -60,6 +61,7 @@ void scInitLists() {
     scInitWall();
     scInitWindow();
     scInitDoor();
+    scInitDarkDoor();
     // characters
     scInitSnowman();
     scInitRobotParts();
@@ -706,10 +708,54 @@ void scInitDoor() {
         glDisable(GL_TEXTURE_2D);
     glEndList();
 }
+
 void scDrawDoor() {
     glCallList(scDoor);
 }
 
+// DARK DOOR
+void scInitDarkDoor() {
+    scDarkDoor = glGenLists(1);
+    glNewList(scDarkDoor, GL_COMPILE);
+        
+        // Frame
+        applyMaterial(&matWhiteWall);     
+        glEnable(GL_TEXTURE_2D); 
+        boundTexture(darkWoodTexture);
+            // top 
+            glPushMatrix();
+                glTranslatef(0.0f, 2.85f, 0.375f); 
+                glScalef(1.0f, 0.3f, 0.25f); 
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+
+            
+            // left/right
+            glPushMatrix();
+                glTranslatef(-0.4f, 1.35f, 0.375f);
+                glScalef(0.2f, 2.7f, 0.25f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+            glPushMatrix();
+                glTranslatef(0.4f, 1.35f, 0.375f);
+                glScalef(0.2f, 2.7f, 0.25f);
+                utDrawTexturedCube(1.0f);
+            glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
+
+        // door
+        applyMaterial(&matConcrete);
+        glPushMatrix();
+            glTranslatef(0.0f, 1.35f, 0.375f);
+            glScalef(0.6f, 2.7f, 0.15f);
+            utDrawTexturedCube(1.0f);
+        glPopMatrix();
+    glEndList();
+}
+
+void scDrawDarkDoor() {
+    glCallList(scDoor);
+}
 
 /*
 ----------

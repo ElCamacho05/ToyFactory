@@ -72,6 +72,10 @@ void utDrawCylinder(float radius, float height, int slices, MATERIAL *mat);
 // compuestos
 void utDrawBrick(double width, double height, double depth, MATERIAL *brickMat);
 
+// TEXTO
+void drawText(const char *text, int x, int y, void* font, float r, float g, float b);
+void drawDialogueBox(const char *speaker, const char *message);
+
 #define LIGHT_ID_UNASSIGNED ((GLenum)-1)
 
 extern GLint GL_LID;

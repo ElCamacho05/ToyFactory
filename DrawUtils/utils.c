@@ -407,3 +407,94 @@ void utDrawCylinder(float radius, float height, int slices, MATERIAL *mat) {
     }
     glEnd();
 }
+
+// TEXTO
+void drawText(const char *text, int x, int y, void* font, float r, float g, float b) {
+    if (!text) return;
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    gluOrtho2D(0, w, 0, h);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glColor3f(r, g, b);
+    glRasterPos2i(x, y);
+    
+    for (const char *c = text; *c != '\0'; c++) {
+        glutBitmapCharacter(font, *c);
+    }
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glColor3f(1.0f, 1.0f, 1.0f); // Reset color blanco
+}
+
+void drawDialogueBox(const char *speaker, const char *message) {
+    int w = glutGet(GLUT_WINDOW_WIDTH);
+    int h = glutGet(GLUT_WINDOW_HEIGHT);
+    
+    // ALPHA CONFIGURATION FOR TRANSPARENCY
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glMatrixMode(GL_PROJECTION); // change matrix projection for 2d rendering
+    glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0, w, 0, h);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+            glLoadIdentity();
+
+            // BACKGROUND
+            glColor4f(1.0f, 1.0f, 1.0f, 0.90f); 
+            glBegin(GL_QUADS);
+                glVertex2i(50, 20);
+                glVertex2i(w - 50, 20);
+                glVertex2i(w - 50, 150);
+                glVertex2i(50, 150);
+            glEnd();
+
+            // FRAME
+            glLineWidth(15.0f);
+            glColor4f(1.0f, 0.0f, 0.0f, 1.0f); 
+            glBegin(GL_LINE_LOOP);
+                glVertex2i(50, 20);
+                glVertex2i(w - 50, 20);
+                glVertex2i(w - 50, 150);
+                glVertex2i(50, 150);
+            glEnd();
+            glLineWidth(1.0f);
+
+            // --------------------- TEXT -----------------------
+            // USER
+            drawText(speaker, 70, 120, GLUT_BITMAP_HELVETICA_18, 0.545f, 0.0f, 0.0f); 
+
+            // MESSAGE
+            drawText(message, 70, 90, GLUT_BITMAP_HELVETICA_18, 0.133f, 0.545f, 0.133f);
+        glPopMatrix();
+        
+        glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+}

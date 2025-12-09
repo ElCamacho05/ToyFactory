@@ -73,6 +73,7 @@ void scInitLists();
     void scInitWall();
     void scInitWindow();
     void scInitDoor();
+    void scInitDarkDoor();
     // characters
     void scInitSnowman();
     void scInitRobotParts();
@@ -95,6 +96,7 @@ void scDrawRoboticArm();
 void scDrawWall();
 void scDrawWindow();
 void scDrawDoor();
+void scDrawDarkDoor();
 // characters
 void scDrawSnowman();
 void scDrawTestRobot();
@@ -114,6 +116,8 @@ extern GLuint scRoboticArm;
 extern GLuint scWall;
 extern GLuint scWindow;
 extern GLuint scDoor;
+extern GLuint scDarkDoor;
+
 // characters
 extern GLuint scSnowman;
 /*

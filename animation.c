@@ -331,6 +331,8 @@ void displayMain() {
         drawRoom(nextRoom);
     glPopMatrix();
 
+    drawDialogueBox("[ SYSTEM ]:", "WELCOME TO THE TOY FACTORY... (Press any key to continue) ");
+
     glutSwapBuffers();
 }
 
