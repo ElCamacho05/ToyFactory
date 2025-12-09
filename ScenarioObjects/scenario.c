@@ -1282,7 +1282,7 @@ void scDrawRobotDirect(R_CORE *robot) {
     if (robot) {
         // Core
         glPushMatrix();
-            glTranslatef(0.0f, 0.9f, 0.0f); 
+            glTranslatef(robot->currentX, 0.9f, robot->currentZ); 
 
             glCallList(robot->drawID);
             if (robot->head) {

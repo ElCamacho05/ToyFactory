@@ -314,9 +314,10 @@ void setupIntermediateRooms(ROOM *room) {
 
     place(room, &scFunnel, -90.0, w, 0);
 
-    for (int x = -w+1; x <= w - 1; x++) {
+    for (int x = -w; x <= w; x++) {
         place(room, &scConveyorBelt, 0.0, x, 0);
     }
+
 
     place(room, &scRoboticArm, 180.0, 1, 1); 
     place(room, &scRoboticArm, 0.0, -2, -1);
@@ -339,7 +340,8 @@ void setupIntermediateRooms(ROOM *room) {
 
     for (int z = -d+1; z <= d; z++) {
         // if (z != 0) place(room, scWall, 90.0, w, z);
-        place(room, &scWall, -90.0, -w, z);
+        
+        if (z != 0) place(room, &scWall, -90.0, -w, z);
     }
 }
 

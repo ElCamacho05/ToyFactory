@@ -257,10 +257,9 @@ void drawRoom(ROOM *room) {
                 float height = 0.0;
                 while (current != NULL) {
                     glPushMatrix();
-                        if (current->drawId == &scRobot) {
-                            // Dibujamos directamente (funciona en ambas ventanas)
-                            scDrawRobotDirect(rCore); 
-                        }
+                        if (current->drawId == &scRobot) 
+                            if (rCore) scDrawRobotDirect(rCore);                             
+                        
                         glTranslatef(0.0, height, 0.0);
                         glRotatef(current->angle, 0.0, 1.0, 0.0);
 
@@ -512,19 +511,35 @@ void animation() {
     long now = glutGet(GLUT_ELAPSED_TIME);
     sceneTime = now - beforeSceneTime;
 
-    // if (sceneTime - actualScene->duration > 0) {
-    //     // updating time of simulation
-    //     beforeSceneTime += actualScene->duration;
-    //     actualScene = actualScene->nextScene;
+    // control the robot movement by the current task 
+    if (rCore && rCore->taskStack) {
+        rCore->isMoving = 1;
 
-    //     // updating camera position for simulation
-    //     camX = actualScene->camX;
-    //     camX = actualScene->camX;
-    //     camX = actualScene->camX;
-    //     camPitch = actualScene->camPitch;
-    //     camYaw = actualScene->camYaw;
-    // }
-    if (nextRoom) {
+        R_TASK *target = rCore->taskStack;
+
+        float dx = target->x - rCore->currentX;
+        float dz = target->z - rCore->currentZ;
+        float distance = sqrt(dx*dx + dz*dz);
+        float moveSpeed = 0.01f;
+
+        if (distance <= moveSpeed) {
+            rCore->currentX = target->x;
+            rCore->currentZ = target->z;
+
+            R_TASK *doneTask = scPopRobotTask(rCore);
+            free(doneTask);
+            
+            if (!rCore->taskStack) rCore->isMoving = 0;
+        } 
+        else {
+            rCore->currentX += (dx / distance) * moveSpeed;
+            rCore->currentZ += (dz / distance) * moveSpeed;
+        }
+    }
+
+    int robotStopped = (rCore == NULL) || (rCore->isMoving == 0);
+    
+    if (nextRoom && robotStopped) {
         if (upElevation > 10.0f) {
             actualRoom = nextRoom;
             nextRoom = NULL;
@@ -546,9 +561,24 @@ void animation() {
 }
 
 R_CORE *addToRobot(int progress, R_CORE *robot, int drawID) {
+    if (progress == -1) {
+        robot = (R_CORE *) calloc(1, sizeof(R_CORE));
+        robot->drawID = drawID;
+        robot->arms = NULL;
+        robot->back = NULL;
+        robot->head = NULL;
+        robot->legs = NULL;
+        robot->taskHistory = NULL;
+        robot->taskStack = NULL;
+        robot->currentX = 0.0f;
+        robot->currentZ = 0.0f;
+        robot->isMoving = 0;
+    }
+
     if (progress == 0) { // CORE
         robot = (R_CORE *) calloc(1, sizeof(R_CORE));
         robot->drawID = drawID;
+
     }
     else if (progress == 1) { // HEAD
         robot->head = (R_HEAD *) calloc(1, sizeof(R_HEAD));
@@ -587,6 +617,13 @@ R_CORE *addToRobot(int progress, R_CORE *robot, int drawID) {
 // SHARED KEYBOARD
 void keyboard(unsigned char key, int x, int y) {
     if (isAsking) {
+        if (phase == START) {
+            rCore = addToRobot(-1, rCore, scRobotTorsoThin);
+            nextRoom = getRoom (1, actualRoom);
+            for (int x = nextRoom->width; x >= nextRoom->width; x--) {
+                scAddRobotTask(rCore, x, 0.0f);
+            }
+        }
         if (phase == READY){
             if (key == '1') {
                 type = ADVENTURER;
@@ -601,7 +638,11 @@ void keyboard(unsigned char key, int x, int y) {
                 isAsking = 0;
             }
             else return;
-            // nextRoom = getRoom (1, actualRoom)
+            nextRoom = getRoom (2, actualRoom);
+
+            for (int x = nextRoom->width; x >= nextRoom->width; x--) {
+                scAddRobotTask(rCore, x, 0.0f);
+            }
         }
     }
 
