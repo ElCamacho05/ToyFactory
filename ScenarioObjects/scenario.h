@@ -29,8 +29,8 @@ typedef struct RobotCore {
     R_LEGS *legs;
     R_BACK *back;
 
-    R_TASK *taskQueue;
-    R_TASK *taskQueueLast;
+    R_TASK *taskStack;
+    R_TASK *taskHistory;
     
     float currentX;
     float currentZ;
@@ -95,6 +95,7 @@ void scInitLists();
     void scInitSnowman();
     void scInitRobotParts();
     void scInitTestRobot();
+    void scUpdateRobotPlot(R_CORE *robot);
 
 /*
 DRAWING
@@ -138,10 +139,14 @@ extern GLuint scDarkDoor;
 
 // characters
 extern GLuint scSnowman;
+extern R_CORE *rCore;
+
+
 /*
 MAIN CHARACTER: ROBOT
 */
 extern GLuint scTestRobot;
+extern GLuint scRobot;
     extern GLuint scRobotHeadNormal;
     // Torsos
     extern GLuint scRobotTorsoThin;

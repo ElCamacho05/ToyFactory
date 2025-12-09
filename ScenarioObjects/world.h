@@ -2,7 +2,7 @@
 #define WORLD_H
 
 typedef struct Element { // list of elements
-    int drawId;
+    int *drawId;
     double angle;
     struct Element *next;
 } ELEMENT;
@@ -50,9 +50,9 @@ extern MAP *test;
 extern MAP *factory;
 extern ROOM *firstRoom;
 
-void setupPhantomElement();
+// void setupPhantomElement();
 TILE *createTile(float position[]);
-ELEMENT *createElement(int idElem, double angle);
+ELEMENT *createElement(int *idElem, double angle);
 void insertElement(TILE **tile, ELEMENT *elem);
 ELEMENT *popElement(TILE **tile);
 void deleteElementsInTile(TILE **tile);
@@ -66,7 +66,7 @@ ROOM *createRoom(int id, int width, int depth);
 ROOM *getRoom(int id, ROOM *room);
 float getTreeWidth(ROOM *room, float xGap);
 void resetGraphFlags(ROOM *room);
-void place(ROOM *room, int elemID, float angle, float posX, float posZ);
+void place(ROOM *room, int *elemID, float angle, float posX, float posZ);
 void setupMapTest();
 void setupMapFactory();
 

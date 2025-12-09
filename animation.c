@@ -50,6 +50,8 @@ ROOM *nextRoom = NULL;
 
 int isDialogPassive = 1;
 int dialogPassed = 0;
+int dialogActive = 1;
+
 char character[30];
 char dialog[100];
 int isAsking = 0;
@@ -69,9 +71,14 @@ enum PHASE{
     BACK,
     FREE
 };
-R_CORE *rCore;
+
+enum TYPE {
+    BUILDER,
+    ADVENTURER
+};
 
 int phase = START;
+int type = -1;
 
 int screenChanging = 0;;
 float upElevation = 0.0;
@@ -79,6 +86,7 @@ float upElevation = 0.0;
 void displayMain();
 void displaySecondary();
 void animation();
+R_CORE *addToRobot(int progress, R_CORE *robot, int drawID);
 void initGL();
 void setupSceneLighting();
 void setupTextures();
@@ -252,9 +260,10 @@ void drawRoom(ROOM *room) {
                         glTranslatef(0.0, height, 0.0);
                         glRotatef(current->angle, 0.0, 1.0, 0.0);
 
-                        if (current->drawId > 0) { // consider phantom element
-                            glCallList(current->drawId);
+                        if (current->drawId > 0) {
+                            glCallList(*(current->drawId));
                         }
+                        // glCallList(scRobot);
                     glPopMatrix();
                     height += 1.0;
                     current = current->next;
@@ -399,7 +408,8 @@ void displayMain() {
         drawRoom(nextRoom);
     glPopMatrix();
 
-    if (isDialogPassive || isAsking) drawDialogueBox(character, dialog);
+    if (dialogActive) drawDialogueBox(character, dialog);
+
     if (dialogPassed) {
         dialogPassed = 0;
         isDialogPassive = 0;
@@ -409,23 +419,21 @@ void displayMain() {
             setDialog("[ SYSTEM ]: ", "Ready for building your Robot? {press any key to continue}...");
             phase = READY;
             isDialogPassive = 1;
+            nextRoom = getRoom(1, actualRoom);
             break;
         case READY:
-            setDialog("[ SYSTEM ]: ", "Okey okey, let's go!!! {press any key to continue}...");
-            phase = CORE;
+            setDialog("[ SYSTEM ]: ", "Which type of robot do you wan't to build? 1) adventurer 2) builder");
             isAsking = 1;
-            isDialogPassive = 0;
+            
             break;
         case CORE:
-            
+
             break;
         default:
             break;
         }
 
     }
-
-
     glutSwapBuffers();
 }
 
@@ -533,58 +541,81 @@ void animation() {
     glutPostRedisplay();
 }
 
+R_CORE *addToRobot(int progress, R_CORE *robot, int drawID) {
+    if (progress == 0) { // CORE
+        robot = (R_CORE *) calloc(1, sizeof(R_CORE));
+        robot->drawID = drawID;
+    }
+    else if (progress == 1) { // HEAD
+        robot->head = (R_HEAD *) calloc(1, sizeof(R_HEAD));
+        robot->head->drawID = drawID;
+    }
+    else if (progress == 2) { // FACE ACCESSORIES
+        robot->head->f_acc = (R_F_ACC *) calloc(1, sizeof(R_F_ACC));
+        robot->head->f_acc->drawID = drawID;
+    }
+    else if (progress == 3) { // ARMS
+        robot->arms = (R_ARMS *) calloc(1, sizeof(R_ARMS));
+        robot->arms->drawID = drawID;
+    }
+    else if (progress == 4) { // TOOL
+        robot->arms->tool = (R_TOOL *) calloc(1, sizeof(R_TOOL));
+        robot->arms->tool->drawID = drawID;
+    }
+    else if (progress == 5) { // LEGS
+        robot->legs = (R_LEGS *) calloc(1, sizeof(R_LEGS));
+        robot->legs->drawID = drawID;
+    }
+    else if (progress == 6) { // BOOTS
+        robot->legs->boots = (R_BOOTS *) calloc(1, sizeof(R_BOOTS));
+        robot->legs->boots->drawID = drawID;
+    }
+    else if (progress == 7) { // BACK
+        robot->back = (R_BACK *) calloc(1, sizeof(R_BACK));
+        robot->back->drawID = drawID;
+    }
+
+    scUpdateRobotPlot(robot);
+
+    return robot;
+}
+
 // SHARED KEYBOARD
 void keyboard(unsigned char key, int x, int y) {
     if (isAsking) {
-        // Enter
-        if (key == 13) {
-            // Clean string and look for the person
-            isAsking = 0;
-            roomToFind[iRtF] = '\0';
-            iRtF = 0;
-
-            printf("[ SEARCHING PERSON... '%s' ] \n", roomToFind);
-            int Pid = atoi(roomToFind);
-            ROOM *found = getRoom(Pid, actualRoom);
-            if (found) {
-                roomToFind[0] = '\0';
-                nextRoom = found;
-            } else {
-                printf("[ ROOM '%s' not found ]\n", roomToFind);
-                isAsking = 1;
+        if (phase == READY){
+            if (key == '1') {
+                type = ADVENTURER;
+                setDialog("[ SYSTEM ]: ", "You have selected Adventurer...");
+                rCore = addToRobot(0, rCore, scRobotTorsoThin);
+                isAsking = 0;
             }
-        }
-        // Backspace
-        else if (key == 8) {
-            if (iRtF > 0) {
-                iRtF--;
-                roomToFind[iRtF] = '\0';
+            else if (key == '2') {
+                setDialog("[ SYSTEM ]: ", "You have selected Builder...");
+                rCore = addToRobot(0, rCore, scRobotTorsoThick);
+                type = BUILDER;
+                isAsking = 0;
             }
+            else return;
+            // nextRoom = getRoom (1, actualRoom)
         }
-        // Add word to the search string
-        else if (iRtF < sizeof(roomToFind) - 1) {
-            roomToFind[iRtF++] = key;
-            roomToFind[iRtF] = '\0';
-        }
-        return;
     }
 
     else if (key == 13 && isDialogPassive){ // Enter
         dialogPassed = 1;
     }
 
-    else if (key == 27) {
+    if (key == 27) {
         exit(0);
     }
 
     else if (key == 'z' || key == 'Z') {
-        viewWidthMain -= 0.1f;
-        if (viewWidthMain < 1.0f) viewWidthMain = 1.0f; 
+        viewWidthMain -= 0.1;
+        if (viewWidthMain < 1.0) viewWidthMain = 1.0; // Limit zoom
     }
 
     else if (key == 'x' || key == 'X') {
-        viewWidthMain += 0.1f;
-        if (viewWidthMain > 20.0f) viewWidthMain = 20.0f;
+        viewWidthMain += 0.1;
     }
 
     else {

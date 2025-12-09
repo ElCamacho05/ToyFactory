@@ -17,14 +17,14 @@ ROOM *firstRoom = NULL;
 // ROOM *MFback;
 // ROOM *MFtool;
 
-void setupPhantomElement() {
-    if (phantom) return;
+// void setupPhantomElement() {
+//     if (phantom) return;
 
-    phantom = (ELEMENT*) malloc(sizeof(ELEMENT));
-    phantom->drawId = -1;
-    phantom->angle = 0;
-    phantom->next = NULL;
-}
+//     phantom = (ELEMENT*) malloc(sizeof(ELEMENT));
+//     phantom->drawId = &(-1);
+//     phantom->angle = 0;
+//     phantom->next = NULL;
+// }
 
 // Creates a Tile (1x1 space) for the map
 TILE *createTile(float position[]) {
@@ -39,7 +39,7 @@ TILE *createTile(float position[]) {
 }
 
 // Create a single element initialized with an object to draw
-ELEMENT *createElement(int idElem, double angle) {
+ELEMENT *createElement(int *idElem, double angle) {
     ELEMENT *elem = (ELEMENT*) malloc(sizeof(ELEMENT));
     
     elem->drawId = idElem;
@@ -257,7 +257,7 @@ void resetGraphFlags(ROOM *room) {
 }
 
 // utility function to simplify adding elements to a room
-void place(ROOM *room, int elemID, float angle, float posX, float posZ) {
+void place(ROOM *room, int *elemID, float angle, float posX, float posZ) {
     int width = room->width;
     int depth = room->depth;
     int rangeDepth = (depth * 2 + 1); // recalculate considering negative coords
@@ -265,6 +265,44 @@ void place(ROOM *room, int elemID, float angle, float posX, float posZ) {
     TILE *tile = room->tileArray[index];
     ELEMENT *elem = createElement(elemID, angle);
     insertElement(&tile, elem);
+}
+
+// ROOMS
+void setupCoreRoom(ROOM *room) {
+    int w = room->width;
+    int d = room->depth;
+
+    // place(room, scDarkDoor, 90.0, w, 0); 
+
+    place(room, &scFunnel, -90.0, w, 0);
+
+    for (int x = -1; x <= w - 1; x++) {
+        place(room, &scConveyorBelt, 0.0, x, 0);
+    }
+
+    place(room, &scRoboticArm, 180.0, 1, 1); 
+    place(room, &scRoboticArm, 0.0, -2, -1);
+
+    place(room, &scStartM, 0.0, -w+1, 0);
+
+    place(room, &scChristmasTree, 0.0, -3, -3);
+    place(room, &scChristmasTree, 45.0, 3, 3);
+    place(room, &scChristmasTree, 90.0, -2, 3);
+    
+    place(room, &scSnowman, -45.0, 2, -2);
+
+    place(room, &scBox, 0.0, -3, 2);
+    place(room, &scBox, 15.0, -3.5, 1.8);
+
+    for (int x = -w; x <= w; x++) {
+        place(room, &scWall, 0.0, x, -d);
+        // place(room, scWindow, -90.0, x, d);
+    }
+
+    for (int z = -d+1; z <= d; z++) {
+        // if (z != 0) place(room, scWall, 90.0, w, z);
+        place(room, &scWall, -90.0, -w, z);
+    }
 }
 
 // map test
@@ -276,38 +314,38 @@ void setupMapTest() {
     test->initialRoom = createRoom(0, width, depth);
 
     // Snowman
-    place(test->initialRoom, scSnowman, 0.0, 3, -1);
+    place(test->initialRoom, &scSnowman, 0.0, 3, -1);
 
     // Start Machine
-    place(test->initialRoom, scStartM, 0.0, 0, 0);
+    place(test->initialRoom, &scStartM, 0.0, 0, 0);
 
     // Robotic Arm
-    place(test->initialRoom, scRoboticArm, 180.0, 3, 1);
+    place(test->initialRoom, &scRoboticArm, 180.0, 3, 1);
 
     // Christmas Tree
-    place(test->initialRoom, scChristmasTree, 0.0, -3, -3);
+    place(test->initialRoom, &scChristmasTree, 0.0, -3, -3);
 
     // Walls
-    place(test->initialRoom, scWall, 0.0, 3, -4);
-    place(test->initialRoom, scDoor, 0.0, 2, -4);
-    place(test->initialRoom, scWall, 0.0, 1, -4);
-    place(test->initialRoom, scWindow, 0.0, 0, -4);
-    place(test->initialRoom, scWindow, 0.0, -1, -4);
-    place(test->initialRoom, scWall, 0.0, -2, -4);
-    place(test->initialRoom, scWall, 0.0, -3, -4);
+    place(test->initialRoom, &scWall, 0.0, 3, -4);
+    place(test->initialRoom, &scDoor, 0.0, 2, -4);
+    place(test->initialRoom, &scWall, 0.0, 1, -4);
+    place(test->initialRoom, &scWindow, 0.0, 0, -4);
+    place(test->initialRoom, &scWindow, 0.0, -1, -4);
+    place(test->initialRoom, &scWall, 0.0, -2, -4);
+    place(test->initialRoom, &scWall, 0.0, -3, -4);
 
     // Chair
-    place(test->initialRoom, scChair, 0.0, -3, 1);
+    place(test->initialRoom, &scChair, 0.0, -3, 1);
 
     // Table
-    place(test->initialRoom, scTable, 0.0, -3, 2);
+    place(test->initialRoom, &scTable, 0.0, -3, 2);
 
     // Lamp
-    place(test->initialRoom, scLamp, 0.0, -3, 2);
+    place(test->initialRoom, &scLamp, 0.0, -3, 2);
 
     // Walls (X = -4, Z [-3,3])
     for (int z = -3; z <= 3; z++) {
-        place(test->initialRoom, scWall, 90.0, -4, z);
+        place(test->initialRoom, &scWall, 90.0, -4, z);
     }
 }
 
@@ -317,69 +355,58 @@ void setupMapFactory() {
     int depth = 4;
     int rangeDepth = (depth * 2 + 1); // recalculate considering negative coords
 
+    /*
+    1: INITIAL MAP
+    */
     factory = (MAP *) malloc(sizeof(MAP));
     factory->initialRoom = createRoom(0, width, depth);
 
     firstRoom = factory->initialRoom;
     // our hero!!!
-    place(factory->initialRoom, scTestRobot, 90.0, 2.0, 2.0);
-
+    place(factory->initialRoom, &scTestRobot, 90.0, 2.0, 2.0);
     // Snowman
-    place(factory->initialRoom, scSnowman, 0.0, 3, -1);
-
+    place(factory->initialRoom, &scSnowman, 0.0, 3, -1);
     // Start Machine
-    place(factory->initialRoom, scStartM, 0.0, 0, 0);
-
+    place(factory->initialRoom, &scStartM, 0.0, 0, 0);
     // Robotic Arm
-    place(factory->initialRoom, scRoboticArm, 180.0, 3, 1);
-
+    place(factory->initialRoom, &scRoboticArm, 180.0, 3, 1);
     // Cardboard Box
-    place(factory->initialRoom, scBox, 180.0, 4, 0);
-
+    place(factory->initialRoom, &scBox, 180.0, 4, 0);
     // Christmas Tree
-    place(factory->initialRoom, scChristmasTree, 0.0, -3, -3);
-
+    place(factory->initialRoom, &scChristmasTree, 0.0, -3, -3);
     // Walls
-    place(factory->initialRoom, scWall, 0.0, 4, -4);
-    place(factory->initialRoom, scWall, 0.0, 3, -4);
-    place(factory->initialRoom, scDoor, 0.0, 2, -4);
-    place(factory->initialRoom, scWall, 0.0, 1, -4);
-    place(factory->initialRoom, scWindow, 0.0, 0, -4);
-    place(factory->initialRoom, scWindow, 0.0, -1, -4);
-    place(factory->initialRoom, scWall, 0.0, -2, -4);
-    place(factory->initialRoom, scWall, 0.0, -3, -4);
-
+    place(factory->initialRoom, &scWall, 0.0, 4, -4);
+    place(factory->initialRoom, &scWall, 0.0, 3, -4);
+    place(factory->initialRoom, &scDoor, 0.0, 2, -4);
+    place(factory->initialRoom, &scWall, 0.0, 1, -4);
+    place(factory->initialRoom, &scWindow, 0.0, 0, -4);
+    place(factory->initialRoom, &scWindow, 0.0, -1, -4);
+    place(factory->initialRoom, &scWall, 0.0, -2, -4);
+    place(factory->initialRoom, &scWall, 0.0, -3, -4);
     // Chair
-    place(factory->initialRoom, scChair, 0.0, -3, 1);
-
+    place(factory->initialRoom, &scChair, 0.0, -3, 1);
     // Table
-    place(factory->initialRoom, scTable, 0.0, -3, 2);
-
+    place(factory->initialRoom, &scTable, 0.0, -3, 2);
     // Lamp
-    place(factory->initialRoom, scLamp, 0.0, -3, 2);
-
+    place(factory->initialRoom, &scLamp, 0.0, -3, 2);
     // Walls (X = -4, Z [-3,3])
     for (int z = -3; z <= 4; z++) {
-        place(factory->initialRoom, scWall, 90.0, -4, z);
+        place(factory->initialRoom, &scWall, 90.0, -4, z);
     }
 
+    /*
+    2: (TORSO) SECOND MAP 
+    */
+    ROOM *Room1 = createRoom(1, 6, 6);
+    linkRooms(factory->initialRoom, Room1);
+    setupCoreRoom(Room1);
+    place(Room1, &scRobot, 0.0, 2.0, 2.0);
 
-    ROOM *Room10 = createRoom(10, width, depth);
-    linkRooms(factory->initialRoom, Room10);
-
-    place(Room10, scChair, 0.0, 2, 4);
-    place(Room10, scRoboticArm, 0.0, 0.0, 0.0);
-
-    ROOM *Room20 = createRoom(20, width, depth);
-    linkRooms(Room10, Room20);
-
-    place(Room20, scChair, 0.0, 2, 4);
-    place(Room20, scRoboticArm, 0.0, 0.0, 0.0);
-
-    ROOM *Room21 = createRoom(21, width, depth);
-    linkRooms(Room10, Room21);
-
-    place(Room21, scChair, 0.0, 2, 4);
-    place(Room21, scRoboticArm, 0.0, 0.0, 0.0);
+    /*
+    HEAD
+    */
+    ROOM *Room2 = createRoom(2, 6, 6);
+    linkRooms(Room1, Room2);
+    setupCoreRoom(Room2);
 }
 

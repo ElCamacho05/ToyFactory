@@ -23,10 +23,14 @@ GLuint scDoor = 0;
 GLuint scDarkDoor = 0;
 // characters
 GLuint scSnowman = 0;
+
+R_CORE *rCore = NULL;
+
 /*
 MAIN CHARACTER: ROBOT
 */
 GLuint scTestRobot = 0;
+GLuint scRobot = 0;
     GLuint scRobotHeadNormal = 0;
     GLuint scRobotTorsoThin = 0;
     GLuint scRobotTorsoThick = 0;
@@ -1271,6 +1275,107 @@ void scInitTestRobot() {
     glEndList();
 }
 
+void scUpdateRobotPlot(R_CORE *robot) {
+    scRobot = glGenLists(1);
+    glNewList(scRobot, GL_COMPILE);
+
+    if (robot) {
+        // Core
+        glPushMatrix();
+            glTranslatef(0.0f, 0.9f, 0.0f); 
+
+            glCallList(robot->drawID);
+            if (robot->head) {
+                // head
+                glPushMatrix();
+                    glTranslatef(0.0f, 0.55f, 0.0f);
+                    glCallList(robot->head->drawID);
+                    if (robot->head->f_acc) {
+                        // glasses
+                        glCallList(robot->head->f_acc->drawID);
+                    }
+                        
+                    glPopMatrix();
+            }
+
+            if (robot->arms) {
+                // arms
+                // left
+                glPushMatrix();
+                    glTranslatef(-0.28f, 0.25f, 0.0f);
+                    glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+                    glCallList(robot->arms->drawID);
+                    
+                    if (robot->arms->tool) {
+                        // tool
+                        glPushMatrix();
+                            glTranslatef(0.0f, -0.6f, 0.0f);
+                            glRotatef(0.0f, 1.0f, 0.0f, 0.0f);
+                            glCallList(robot->arms->tool->drawID);
+                        glPopMatrix();
+                    }
+                glPopMatrix();
+
+                // Right
+                glPushMatrix();
+                    glTranslatef(0.28f, 0.25f, 0.0f);
+                    glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+                    glRotatef(-45.0f, 1.0f, 0.0f, 0.0f);
+                    glCallList(robot->arms->drawID);
+                    
+                    if (robot->arms->tool) {
+                        glPushMatrix();
+                            glTranslatef(0.0f, -0.6f, 0.0f);
+                            glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+                            glCallList(robot->arms->tool->drawID);
+                        glPopMatrix();
+                    }
+                glPopMatrix();
+            }
+            
+            if (robot->back) {
+                // backpack
+                glPushMatrix();
+                    glTranslatef(0.0f, 0.1f, -0.15f);
+                    glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+                    glCallList(robot->back->drawID); 
+                glPopMatrix();
+            }
+        
+            // legs
+            if (robot->legs) {
+                // left
+                glPushMatrix();
+                    glTranslatef(-0.15f, -0.3f, 0.0f);
+                    glCallList(scRobotLegSimple);
+                    // boots
+                    if (robot->legs->boots) {
+                        glPushMatrix();
+                            glTranslatef(0.0f, -0.6f, 0.0f);
+                            glCallList(robot->legs->boots->drawID);
+                        glPopMatrix();
+                    }
+                glPopMatrix();
+                // right
+                
+                glPushMatrix();
+                    glTranslatef(0.15f, -0.3f, 0.0f);
+                    glCallList(scRobotLegSimple);
+                    // boots
+                    if (robot->legs->boots) {
+                        glPushMatrix();
+                            glTranslatef(0.0f, -0.6f, 0.0f);
+                            glCallList(scRobotBootThruster);
+                        glPopMatrix();
+                    }
+                glPopMatrix();
+            }
+        glPopMatrix();
+        glEndList();
+    }
+    
+}
+
 void scDrawTestRobot() {
     glCallList(scTestRobot);
 }
@@ -1285,8 +1390,8 @@ R_CORE *scCreateRobotInstance() {
     robot->legs = NULL;
     robot->back = NULL;
     
-    robot->taskQueue = NULL;
-    robot->taskQueueLast = NULL;
+    robot->taskStack = NULL;
+    robot->taskHistory = NULL;
     
     robot->currentX = 0.0f;
     robot->currentZ = 0.0f;
@@ -1301,27 +1406,18 @@ void scAddRobotTask(R_CORE *robot, float targetX, float targetZ) {
     R_TASK *newTask = (R_TASK*) malloc(sizeof(R_TASK));
     newTask->x = targetX;
     newTask->z = targetZ;
-    newTask->next = NULL;
-
-    if (robot->taskQueue == NULL) {
-        robot->taskQueue = newTask;
-        robot->taskQueueLast = newTask;
-    } else {
-        robot->taskQueueLast->next = newTask;
-        robot->taskQueueLast = newTask;
-    }
-    printf("Tarea agregada al robot: Ir a (%.1f, %.1f)\n", targetX, targetZ);
+    
+    // En una pila, el nuevo es el primero (head)
+    newTask->next = robot->taskStack;
+    robot->taskStack = newTask;
 }
 
 R_TASK *scPopRobotTask(R_CORE *robot) {
-    if (!robot || !robot->taskQueue) return NULL;
+    if (!robot || !robot->taskStack) return NULL;
 
-    R_TASK *task = robot->taskQueue;
-    robot->taskQueue = task->next;
+    R_TASK *task = robot->taskStack;
+    robot->taskStack = task->next;
     
-    if (robot->taskQueue == NULL) {
-        robot->taskQueueLast = NULL;
-    }
-
-    return task;
+    task->next = NULL;
+    return task; 
 }
